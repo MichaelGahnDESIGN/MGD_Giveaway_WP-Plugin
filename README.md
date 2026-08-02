@@ -69,9 +69,9 @@ Aktuelle Version: `0.0.34`
 
 | Projekt | Beschreibung |
 |---------|-------------|
-| [MGD-Divi5-Dev](https://github.com/MichaelGahnDESIGN/MGD-Divi5-Dev) | Divi 5 Entwicklungs-Workflow für WordPress |
-| [MGD-AI-Project-Updater-Skill](https://github.com/MichaelGahnDESIGN/MGD-AI-Project-Updater-Skill) | Sichere Update-Workflows für WordPress |
-| [MGD-AI-Basic-Projektordner](https://github.com/MichaelGahnDESIGN/MGD-AI-Basic-Projektordner) | Projektvorlage für KI-Agenten |
+| [MGD-Divi5-Dev](https://github.com/MichaelGahnDESIGN/MGD_Divi5-Dev_SKILL) | Divi 5 Entwicklungs-Workflow für WordPress |
+| [MGD-AI-Project-Updater-Skill](https://github.com/MichaelGahnDESIGN/MGD_AI-Project-Updater_SKILL) | Sichere Update-Workflows für WordPress |
+| [MGD-AI-Basic-Projektordner](https://github.com/MichaelGahnDESIGN/MGD_AI-Basic-Projektordner_TOOL) | Projektvorlage für KI-Agenten |
 
 → Alle öffentlichen Projekte: [github.com/MichaelGahnDESIGN](https://github.com/MichaelGahnDESIGN)
 
