@@ -1,5 +1,7 @@
 # MGD Giveaway
 
+Copyright (c) 2026 Michael Gahn DESIGN - https://Michael-Gahn.de
+
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](LICENSE)
 [![WordPress: ab 6.0](https://img.shields.io/badge/WordPress-ab%206.0-21759B.svg)](#)
 [![PHP: ab 7.4](https://img.shields.io/badge/PHP-ab%207.4-777BB4.svg)](#)
