@@ -1,0 +1,53 @@
+name: Prüfen und Release-Paket erstellen
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP-Syntax prüfen
+        run: find mgd-giveaway tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Updater-Vertrag prüfen
+        run: php tests/updater-test.php
+      - name: Release-Paket bauen
+        shell: bash
+        run: |
+          version="$(sed -n 's/^ \* Version: //p' mgd-giveaway/mgd-giveaway.php | head -1)"
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" && "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "Tag und Plugin-Version stimmen nicht überein" >&2
+            exit 1
+          fi
+          bash scripts/build-release.sh "$version"
+      - name: Paketstruktur prüfen
+        run: |
+          test "$(unzip -Z1 build/mgd-giveaway.zip | grep -c '^mgd-giveaway/mgd-giveaway.php$')" -eq 1
+          unzip -tq build/mgd-giveaway.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mgd-giveaway
+          path: build/mgd-giveaway.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: pruefen
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: mgd-giveaway
+          path: build
+      - name: GitHub-Release mit installierbarem ZIP veröffentlichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" build/mgd-giveaway.zip --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
