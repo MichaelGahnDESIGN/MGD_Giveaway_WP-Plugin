@@ -57,4 +57,21 @@ jobs:
       - name: GitHub-Release mit installierbarem ZIP veröffentlichen
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" build/mgd-giveaway.zip --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+        shell: bash
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            # Ein manuell geprüfter Entwurf kann bereits veröffentlicht sein.
+            # ZIP-Zeitstempel dürfen abweichen, Dateiinhalt und Pfade nicht.
+            mkdir -p "$RUNNER_TEMP/mgd-existing"
+            gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+              --pattern mgd-giveaway.zip --dir "$RUNNER_TEMP/mgd-existing"
+            existing="$RUNNER_TEMP/mgd-existing/mgd-giveaway.zip"
+            diff -u <(unzip -Z1 build/mgd-giveaway.zip | sort) <(unzip -Z1 "$existing" | sort)
+            while IFS= read -r path; do
+              [[ "$path" == */ ]] && continue
+              cmp <(unzip -p build/mgd-giveaway.zip "$path") <(unzip -p "$existing" "$path")
+            done < <(unzip -Z1 build/mgd-giveaway.zip)
+          else
+            gh release create "$GITHUB_REF_NAME" build/mgd-giveaway.zip \
+              --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi
