@@ -9,6 +9,12 @@ require __DIR__ . '/../mgd-giveaway/includes/class-mgd-giveaway-updater.php';
 // Kleine WordPress-Attrappen prüfen die Einbindung ohne Netz und Datenbank.
 $GLOBALS['mgd_test_release_response'] = null;
 $GLOBALS['mgd_test_cache'] = [];
+$GLOBALS['mgd_test_actions'] = [];
+function add_filter(...$args) { return true; }
+function add_action($hook, $callback, $priority = 10, $accepted_args = 1) {
+    $GLOBALS['mgd_test_actions'][$hook] = $accepted_args;
+    return true;
+}
 function plugin_basename($file) { return 'mgd-giveaway/' . basename($file); }
 function get_site_transient($key) { return $GLOBALS['mgd_test_cache'][$key] ?? false; }
 function set_site_transient($key, $value, $ttl) { $GLOBALS['mgd_test_cache'][$key] = $value; return true; }
@@ -17,6 +23,14 @@ function wp_safe_remote_get($url, $args) { return $GLOBALS['mgd_test_release_res
 function is_wp_error($value) { return false; }
 function wp_remote_retrieve_response_code($response) { return $response['status']; }
 function wp_remote_retrieve_body($response) { return $response['body']; }
+
+// WordPress liefert dem Abschluss-Hook zwei Argumente. Ein einziges führt beim
+// echten Backend-Update zu einem PHP-Fatal-Error nach dem Dateiaustausch.
+MGD_Giveaway_Updater::register();
+if (($GLOBALS['mgd_test_actions']['upgrader_process_complete'] ?? 0) !== 2) {
+    fwrite(STDERR, "Abschluss-Hook muss zwei WordPress-Argumente erhalten.\n");
+    exit(1);
+}
 
 function assertRelease($expected, array $data, string $message): void
 {
@@ -78,4 +92,4 @@ if (($transient->response['mgd-giveaway/mgd-giveaway.php']->new_version ?? null)
     exit(1);
 }
 
-echo "Updater-Vertrag: 9 Fälle bestanden.\n";
+echo "Updater-Vertrag: 10 Fälle bestanden.\n";
