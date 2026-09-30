@@ -12,8 +12,14 @@ permissions:
 jobs:
   pruefen:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.4']
     steps:
       - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
       - name: PHP-Syntax prüfen
         run: find mgd-giveaway tests -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Updater-Vertrag prüfen
@@ -31,7 +37,8 @@ jobs:
         run: |
           test "$(unzip -Z1 build/mgd-giveaway.zip | grep -c '^mgd-giveaway/mgd-giveaway.php$')" -eq 1
           unzip -tq build/mgd-giveaway.zip
-      - uses: actions/upload-artifact@v4
+      - if: matrix.php == '8.4'
+        uses: actions/upload-artifact@v4
         with:
           name: mgd-giveaway
           path: build/mgd-giveaway.zip
