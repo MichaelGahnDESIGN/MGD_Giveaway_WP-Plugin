@@ -19,7 +19,9 @@ final class MGD_Giveaway_Updater
         add_filter('update_plugins_github.com', [self::class, 'updateUriResponse'], 10, 4);
         add_filter('pre_set_site_transient_update_plugins', [self::class, 'injectUpdate']);
         add_filter('plugins_api', [self::class, 'pluginInformation'], 20, 3);
-        add_action('upgrader_process_complete', [self::class, 'clearCache']);
+        // WordPress übergibt Upgrader und Paketkontext. Die Standardanzahl 1
+        // würde nach einem erfolgreichen Dateiaustausch einen Fatal Error auslösen.
+        add_action('upgrader_process_complete', [self::class, 'clearCache'], 10, 2);
     }
 
     /** @param mixed $transient @return mixed */
