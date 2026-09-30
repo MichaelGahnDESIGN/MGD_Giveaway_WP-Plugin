@@ -1,5 +1,13 @@
 # Versionen
 
+## 2026-09-30 - Version 0.0.35 (vorbereitet, noch kein veröffentlichtes Release)
+
+Beschreibung: GitHub-Release-Updates über WordPress' regulären Plugin-Updater; reproduzierbarer Paketbau mit Versions- und Ordnerprüfung.
+Begründung: Plugin-Updates sollen im Backend sichtbar und nach Freigabe installierbar sein, ohne an den Plugin-Dateien per FTP zu arbeiten.
+Betroffene Bereiche: Plugin-Header, GitHub-Updater, Release-Workflow, Dokumentation.
+Rücknahme: Vorheriges Release-ZIP und vollständiges Website-/Datenbank-Backup wiederherstellen. Formular- und Kontaktdaten liegen in der Datenbank und werden vom Paket nicht gelöscht.
+Einschränkung: Der Versionswechsel muss nach Veröffentlichung an einer WordPress-Testinstallation geprüft werden; diese Dokumentation belegt noch keinen Live-Update-Erfolg.
+
 ## 2026-04-30 - Version 0.0.34
 
 Beschreibung: E-Mail-Vorschau im Formular-Backend ergänzt.

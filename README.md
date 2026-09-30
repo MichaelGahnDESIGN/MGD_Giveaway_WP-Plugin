@@ -29,7 +29,7 @@ Wer ein Gratis-eBook oder PDF gegen Anmeldung anbieten möchte, braucht dafür s
 > [!NOTE]
 > **👤 FÜR ENTWICKLER**
 >
-> 1. ZIP-Datei aus `dist/mgd-giveaway-v0.0.34.zip` in WordPress hochladen (oder den Ordner `mgd-giveaway` direkt nach `wp-content/plugins/` kopieren).
+> 1. Für die Erstinstallation `mgd-giveaway.zip` aus dem [aktuellen GitHub-Release](https://github.com/MichaelGahnDESIGN/MGD_Giveaway_WP-Plugin/releases) in WordPress hochladen (oder den Ordner `mgd-giveaway` direkt nach `wp-content/plugins/` kopieren). Ältere ZIPs unter `dist/` sind nur historische Pakete.
 > 2. Plugin im WordPress-Backend aktivieren.
 > 3. Unter `MGD Giveaway` ein neues Formular anlegen.
 > 4. Eine Datei aus der WordPress-Mediathek als Download hinterlegen.
@@ -44,6 +44,8 @@ Anforderungen laut Plugin-Header (`mgd-giveaway/mgd-giveaway.php`) und `readme.t
 | Lizenz | GPL-2.0-or-later |
 
 ## Erste Schritte
+
+Ab Version `0.0.35` zeigt WordPress neue, reguläre GitHub-Releases unter **Plugins → Aktualisierungen** an. Die Installation erfolgt durch WordPress nach Freigabe durch eine berechtigte Person; das Plugin überschreibt sich nicht selbst. Für bereits installierte Versionen bis `0.0.34` ist **einmalig** ein Update per ZIP nötig, weil deren Code noch keine GitHub-Updatequelle kennt. Vorher Website und Datenbank sichern. Der Release-Kanal ist öffentlich; eine private Installation oder geheime GitHub-Zugangsdaten werden nicht unterstützt.
 
 Das Formular wird über einen Shortcode mit der jeweiligen Formular-ID eingebunden:
 
@@ -101,7 +103,7 @@ Die erste Version nutzt nur kostenlose, kommerziell nutzbare Komponenten:
 
 ## Version
 
-Aktuelle Version: `0.0.34`
+Aktuelle Quellversion: `0.0.35` (ein GitHub-Release ist erst nach erfolgreicher Veröffentlichung verfügbar)
 
 ---
 

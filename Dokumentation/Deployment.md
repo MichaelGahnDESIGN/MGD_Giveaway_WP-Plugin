@@ -1,6 +1,12 @@
 # Deployment
 
-Die auslieferbare ZIP liegt unter `dist/mgd-giveaway-v0.0.34.zip`.
+Das versionierte Release-ZIP wird mit `bash scripts/build-release.sh 0.0.35` nach `build/mgd-giveaway.zip` gebaut. Der Tag muss `v0.0.35` heißen. Die GitHub-Aktion prüft PHP-Syntax, Updater-Vertrag und Paketstruktur und veröffentlicht genau diese ZIP als Release-Asset. `dist/` enthält nur historische ZIP-Dateien.
+
+## Updates im WordPress-Backend
+
+Ab Version 0.0.35 erkennt WordPress freigegebene öffentliche GitHub-Releases automatisch. Die Plugin-Version im PHP-Header, die PHP-Konstante, der Stable Tag und der Git-Tag müssen übereinstimmen. Das Asset heißt immer `mgd-giveaway.zip` und enthält den Ordner `mgd-giveaway/` als einzige Wurzel. Der Updater akzeptiert weder Entwürfe noch Vorabversionen oder fremde Download-Adressen. Die Release-Antwort wird höchstens eine Stunde zwischengespeichert; WordPress' eigener Prüfplan kann zusätzlich verzögern. Für eine schnellere manuelle Prüfung: **Dashboard → Aktualisierungen → Erneut prüfen**.
+
+Die Veröffentlichung eines GitHub-Releases installiert nichts unbeaufsichtigt. WordPress zeigt die neue Version an; ein Administrator entscheidet über die Installation beziehungsweise über die WordPress-eigene Auto-Update-Einstellung. Nach dem Update die Plugin-Aktivierung, Formularausgabe und einen Test-Download prüfen. Bei Problemen das vorherige, geprüfte Release-ZIP erneut installieren und das Website-/Datenbank-Backup zur Wiederherstellung bereithalten. Bestehende Installationen bis 0.0.34 benötigen zuerst einmalig ein manuelles ZIP-Update auf 0.0.35.
 
 Vor einem produktiven Release prüfen:
 
