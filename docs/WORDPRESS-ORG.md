@@ -61,3 +61,7 @@ Nur Statistiken zu Einsendungen, Loganzahl und Loggröße werden während einer 
 Es gibt jetzt ausdrücklich offengelegte statische Einzel-Ausnahmen. Die früheren Aussagen zu unverändert erhaltenen Rohmeldungen beschreiben die damaligen Läufe; der neue Stand enthält die fachlich geprüften Code-Anmerkungen. Keine Laufzeit-/Performance-Prüfung wird ausgeschaltet. Vollständige Liste: `wordpress-org/GEPRUEFTE-AUSNAHMEN.md`; neuer Bericht: `wordpress-org/ERGEBNIS.md`.
 
 Die späte Ressourcenausgabe läuft am Ende von wp_footer und ergänzt ausschließlich noch nicht gedruckte eigene CSS-/JS-Handles. Dadurch funktionieren auch Widgets, die nach dem normalen Footer-Skripttermin gerendert werden. Browsernachweis: Testausgabe mit wp_footer-Priorität 30, genau ein Stylesheet und Skript, Modal/Escape und 390px.
+
+## Rohbericht statt nur Exit-Code
+
+Die CI prüft nach dem offiziellen Plugin Check auch dessen vollständige Datei im Runner-Temp-Verzeichnis. Ein neuer Validator schlägt bei PHP-/Datenbankfehlern oder unbekannten Ausgaben fehl, selbst wenn der Plugin-Check-Wrapper einen grünen Status liefern sollte. Acht Parser-Regressionen laufen vor jedem Check; keine Warnungsgruppe wird dadurch ausgeblendet.
