@@ -3,7 +3,7 @@
  * Plugin Name: MGD Giveaway
  * Plugin URI: https://github.com/MichaelGahnDESIGN/MGD_Giveaway_WP-Plugin
  * Description: Erstellt Download-Formulare für Gratis-eBooks und PDFs mit Shortcode, Backend-Verwaltung und Credits.
- * Version: 0.0.36
+ * Version: 0.0.37
  * Author: Michael Gahn DESIGN
  * Author URI: https://Michael-Gahn.de
  * License: GPL-2.0-or-later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('MGD_GIVEAWAY_VERSION', '0.0.36');
+define('MGD_GIVEAWAY_VERSION', '0.0.37');
 define('MGD_GIVEAWAY_FILE', __FILE__);
 define('MGD_GIVEAWAY_DIR', plugin_dir_path(__FILE__));
 define('MGD_GIVEAWAY_URL', plugin_dir_url(__FILE__));
@@ -39,3 +39,18 @@ add_action('plugins_loaded', function () {
 
 // Icon in der Pluginverwaltung.
 (require __DIR__ . '/includes/plugin-icon.php')(__FILE__);
+
+require_once __DIR__ . '/includes/class-mgd-plugin-admin-tools.php';
+\MGD_Plugin_Admin_Tools_20261023::register([
+    'file' => __FILE__,
+    'repo' => 'MGD_Giveaway_WP-Plugin',
+    'slug' => 'mgd-giveaway',
+    'name' => 'MGD Giveaway',
+    'description' => 'Erstellt Download-Formulare für Gratis-eBooks und PDFs mit Shortcode, Backend-Verwaltung und Credits.',
+    'version' => '0.0.37',
+    'settings' => 'admin.php?page=mgd-giveaway',
+    'requires' => '6.0',
+    'php' => '7.4',
+    'caches' => ['mgd_giveaway_github_release'],
+    'package' => '',
+]);
