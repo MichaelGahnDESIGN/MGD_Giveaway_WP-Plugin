@@ -38,7 +38,7 @@ jobs:
           test "$(unzip -Z1 build/mgd-giveaway.zip | grep -c '^mgd-giveaway/mgd-giveaway.php$')" -eq 1
           unzip -tq build/mgd-giveaway.zip
       - if: matrix.php == '8.4'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mgd-giveaway
           path: build/mgd-giveaway.zip
