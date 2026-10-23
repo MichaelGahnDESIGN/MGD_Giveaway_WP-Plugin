@@ -23,7 +23,7 @@ jobs:
       - name: PHP-Syntax prüfen
         run: find mgd-giveaway tests -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Updater-Vertrag prüfen
-        run: php tests/updater-test.php
+        run: python3 scripts/build-wordpress-org.py && php tests/wordpress-org-contract.php
       - name: Release-Paket bauen
         shell: bash
         run: |

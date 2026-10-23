@@ -9,9 +9,8 @@
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: mgd-giveaway
- * Requires at least: 6.0
+ * Requires at least: 6.5
  * Requires PHP: 7.4
- * Update URI: https://github.com/MichaelGahnDESIGN/MGD_Giveaway_WP-Plugin
  */
 
 if (!defined('ABSPATH')) {
@@ -24,11 +23,9 @@ define('MGD_GIVEAWAY_DIR', plugin_dir_path(__FILE__));
 define('MGD_GIVEAWAY_URL', plugin_dir_url(__FILE__));
 
 require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-giveaway-plugin.php';
-require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-giveaway-updater.php';
 
 // Der öffentliche Release-Kanal ist unabhängig von Formularen und Besuchern.
 // Nur WordPress' Updateprüfung darf ihn aufrufen; keine Frontend-Daten werden versendet.
-MGD_Giveaway_Updater::register();
 
 register_activation_hook(__FILE__, array('MGD_Giveaway_Plugin', 'activate'));
 register_uninstall_hook(__FILE__, array('MGD_Giveaway_Plugin', 'uninstall'));
@@ -41,7 +38,7 @@ add_action('plugins_loaded', function () {
 (require __DIR__ . '/includes/plugin-icon.php')(__FILE__);
 
 require_once __DIR__ . '/includes/class-mgd-plugin-admin-tools.php';
-\MGD_Plugin_Admin_Tools_20261023::register([
+\MGD_WordPress_Org_Admin_Tools::register([
     'file' => __FILE__,
     'repo' => 'MGD_Giveaway_WP-Plugin',
     'slug' => 'mgd-giveaway',
