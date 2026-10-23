@@ -17,6 +17,8 @@ class MGD_Giveaway_Plugin
     private $download_token_max_age = 2592000;
     private $confirm_token_max_age = 1209600;
     private $rendering_privacy_modal = false;
+    private $stats_cache_keys = array();
+    private const STATS_CACHE_GROUP = 'mgd_giveaway_request_stats';
 
     public static function instance()
     {
@@ -37,7 +39,8 @@ class MGD_Giveaway_Plugin
         add_action('init', array($this, 'maybe_upgrade'));
         add_action('admin_menu', array($this, 'register_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+        add_action('wp_enqueue_scripts', array($this, 'prepare_frontend_assets'));
+        add_action('wp_footer', array($this, 'print_late_frontend_styles'), 1);
         add_action('template_redirect', array($this, 'handle_masked_download'));
         add_action('template_redirect', array($this, 'handle_double_opt_in_confirm'));
         add_shortcode('mgd_giveaway', array($this, 'render_shortcode'));
@@ -93,7 +96,9 @@ class MGD_Giveaway_Plugin
         delete_option('mgd_giveaway_version');
 
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Nur bei Deinstallation: eigene Tabellen entfernen; kein Lese-Cache.
         $wpdb->query($wpdb->prepare('DROP TABLE IF EXISTS %i', $wpdb->prefix . 'mgd_giveaway_submissions'));
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Nur bei Deinstallation: eigene Tabellen entfernen; kein Lese-Cache.
         $wpdb->query($wpdb->prepare('DROP TABLE IF EXISTS %i', $wpdb->prefix . 'mgd_giveaway_logs'));
     }
 
@@ -183,6 +188,25 @@ class MGD_Giveaway_Plugin
         wp_enqueue_media();
         wp_enqueue_style('mgd-giveaway-admin', MGD_GIVEAWAY_URL . 'assets/admin.css', array(), MGD_GIVEAWAY_VERSION);
         wp_enqueue_script('mgd-giveaway-admin', MGD_GIVEAWAY_URL . 'assets/admin.js', array('jquery'), MGD_GIVEAWAY_VERSION, true);
+    }
+
+    /** Normale Inhaltsseiten früh erkennen; dynamische Builder laden direkt im Shortcode nach. */
+    public function prepare_frontend_assets()
+    {
+        global $wp_query;
+        foreach ($wp_query->posts ?? array() as $post) {
+            if ($post instanceof WP_Post && has_shortcode($post->post_content, 'mgd_giveaway')) {
+                $this->enqueue_frontend_assets();
+                return;
+            }
+        }
+    }
+
+    public function print_late_frontend_styles()
+    {
+        if (wp_style_is('mgd-giveaway-frontend', 'enqueued') && !wp_style_is('mgd-giveaway-frontend', 'done')) {
+            wp_print_styles('mgd-giveaway-frontend');
+        }
     }
 
     public function enqueue_frontend_assets()
@@ -311,11 +335,13 @@ class MGD_Giveaway_Plugin
             wp_die(esc_html__('Keine Berechtigung.', 'mgd-giveaway'));
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Anzeige des autorisierten Editors; Speichern erfolgt separat mit Nonce.
         $form_id = isset($_GET['form_id']) ? absint($_GET['form_id']) : 0;
         $post = $form_id ? get_post($form_id) : null;
         $config = $form_id ? $this->get_form_config($form_id) : $this->get_form_config(0);
         $attachment_id = (int) $config['download_attachment_id'];
         $attachment_title = $attachment_id ? get_the_title($attachment_id) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Anzeige des autorisierten Editors; Speichern erfolgt separat mit Nonce.
         $active_tab = isset($_GET['mgd_tab']) ? sanitize_key(wp_unslash($_GET['mgd_tab'])) : 'fields';
         $allowed_tabs = array('fields', 'settings', 'download', 'email', 'design', 'preview');
         if (!in_array($active_tab, $allowed_tabs, true)) {
@@ -559,18 +585,10 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Suchfilter der autorisierten Liste, keine Zustandsänderung.
         $search = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : '';
-        $where = '1=1';
-        $params = array();
-
-        if ($search) {
-            $where .= ' AND (email LIKE %s OR data LIKE %s)';
-            $like = '%' . $wpdb->esc_like($search) . '%';
-            $params[] = $like;
-            $params[] = $like;
-        }
-
         $like = '%' . $wpdb->esc_like($search) . '%';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
         $items = $wpdb->get_results($wpdb->prepare('SELECT * FROM %i WHERE (%s = %s OR email LIKE %s OR data LIKE %s) ORDER BY created_at DESC LIMIT 200', $this->submission_table, $search, '', $like, $like));
 
         echo '<div class="wrap mgd-admin"><h1>Mail-Liste</h1>';
@@ -641,26 +659,13 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Such- und Anzeigefilter, keine Zustandsänderung.
         $search = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Such- und Anzeigefilter, keine Zustandsänderung.
         $level = isset($_GET['level']) ? sanitize_key($_GET['level']) : '';
-        $where = '1=1';
-        $params = array();
-
-        if ($search) {
-            $where .= ' AND (event LIKE %s OR message LIKE %s OR context LIKE %s)';
-            $like = '%' . $wpdb->esc_like($search) . '%';
-            $params[] = $like;
-            $params[] = $like;
-            $params[] = $like;
-        }
-
-        if ($level && in_array($level, array('info', 'warning', 'error'), true)) {
-            $where .= ' AND level = %s';
-            $params[] = $level;
-        }
-
         $like = '%' . $wpdb->esc_like($search) . '%';
         $level = in_array($level, array('info', 'warning', 'error'), true) ? $level : '';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
         $logs = $wpdb->get_results($wpdb->prepare('SELECT * FROM %i WHERE (%s = %s OR event LIKE %s OR message LIKE %s OR context LIKE %s) AND (%s = %s OR level = %s) ORDER BY created_at DESC LIMIT 300', $this->log_table, $search, '', $like, $like, $like, $level, '', $level));
         $storage = $this->get_log_storage_usage();
 
@@ -1010,6 +1015,7 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
         $items = $wpdb->get_results($wpdb->prepare('SELECT * FROM %i ORDER BY created_at DESC', $this->submission_table), ARRAY_A);
         $this->add_log('info', 'mail_list_export', 'Mail-Liste als CSV exportiert.', array('count' => count($items)));
 
@@ -1027,13 +1033,14 @@ class MGD_Giveaway_Plugin
             exit;
         }
 
-        $file = $_FILES['mail_list_csv'];
-        $filename = isset($file['name']) ? sanitize_file_name($file['name']) : '';
-        $tmp_name = isset($file['tmp_name']) ? $file['tmp_name'] : '';
+        $filename = isset($_FILES['mail_list_csv']['name']) && is_string($_FILES['mail_list_csv']['name']) ? sanitize_file_name($_FILES['mail_list_csv']['name']) : '';
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- PHP-Uploadpfad unverändert prüfen; is_uploaded_file() unten verhindert beliebige lokale Pfade.
+        $tmp_name = isset($_FILES['mail_list_csv']['tmp_name']) && is_string($_FILES['mail_list_csv']['tmp_name']) ? $_FILES['mail_list_csv']['tmp_name'] : '';
         $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        $file_size = isset($file['size']) ? (int) $file['size'] : 0;
+        $file_size = isset($_FILES['mail_list_csv']['size']) ? absint($_FILES['mail_list_csv']['size']) : 0;
+        $upload_error = isset($_FILES['mail_list_csv']['error']) ? absint($_FILES['mail_list_csv']['error']) : UPLOAD_ERR_NO_FILE;
 
-        if ('csv' !== $extension || !is_uploaded_file($tmp_name) || $file_size > $this->max_csv_upload_bytes) {
+        if (UPLOAD_ERR_OK !== $upload_error || 'csv' !== $extension || !is_uploaded_file($tmp_name) || $file_size > $this->max_csv_upload_bytes) {
             $this->add_log('warning', 'mail_list_import_rejected', 'CSV Import abgelehnt.', array('filename' => $filename, 'size' => $file_size));
             wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-mail-list&mgd_notice=import_invalid'));
             exit;
@@ -1075,6 +1082,7 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
         $item = $wpdb->get_row($wpdb->prepare('SELECT * FROM %i WHERE id = %d', $this->submission_table, $submission_id), ARRAY_A);
         if (!$item) {
             wp_die(esc_html__('Eintrag nicht gefunden.', 'mgd-giveaway'));
@@ -1096,7 +1104,10 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
         $item = $wpdb->get_row($wpdb->prepare('SELECT email FROM %i WHERE id = %d', $this->submission_table, $submission_id), ARRAY_A);
+        $this->invalidate_stats();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
         $wpdb->delete($this->submission_table, array('id' => $submission_id), array('%d'));
         $this->add_log('info', 'contact_deleted', 'Kontakt-Daten gelöscht.', array('submission_id' => $submission_id, 'email' => isset($item['email']) ? $item['email'] : ''));
         wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-mail-list&mgd_notice=contact_deleted'));
@@ -1110,6 +1121,7 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
         $logs = $wpdb->get_results($wpdb->prepare('SELECT * FROM %i ORDER BY created_at DESC', $this->log_table), ARRAY_A);
         $this->output_csv('mgd-giveaway-logs.csv', array('id', 'level', 'event', 'message', 'context', 'created_at'), $logs);
     }
@@ -1121,6 +1133,8 @@ class MGD_Giveaway_Plugin
         }
 
         global $wpdb;
+        $this->invalidate_stats();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
         $wpdb->query($wpdb->prepare('TRUNCATE TABLE %i', $this->log_table));
         wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-logs&mgd_notice=logs_cleared'));
         exit;
@@ -1140,6 +1154,7 @@ class MGD_Giveaway_Plugin
             return '<p class="mgd-giveaway-error">Formular nicht gefunden.</p>';
         }
 
+        $this->enqueue_frontend_assets();
         $config = $this->get_form_config($form_id);
         ob_start();
         $wrapper_id = 'mgd-giveaway-' . $form_id;
@@ -1184,11 +1199,14 @@ class MGD_Giveaway_Plugin
 
     private function get_success_payload($form_id)
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Ausgabe eines zeitlich begrenzten Ergebnisses über zufälliges Token, keine Änderung.
         $success_form_id = isset($_GET['mgd_form']) ? absint($_GET['mgd_form']) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Ausgabe eines zeitlich begrenzten Ergebnisses über zufälliges Token, keine Änderung.
         if ($success_form_id !== $form_id || empty($_GET['mgd_giveaway_success'])) {
             return false;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Ausgabe eines zeitlich begrenzten Ergebnisses über zufälliges Token, keine Änderung.
         $token = sanitize_text_field((string) wp_unslash($_GET['mgd_giveaway_success']));
         $payload = get_transient($this->get_success_transient_key($token));
         if (!is_array($payload) || empty($payload['form_id']) || (int) $payload['form_id'] !== $form_id) {
@@ -1234,6 +1252,7 @@ class MGD_Giveaway_Plugin
             15 * MINUTE_IN_SECONDS
         );
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Private Hilfe nach geprüfter Formular-Nonce; Ziel wird zusätzlich mit wp_validate_redirect begrenzt.
         $return_url = $return_url ? $return_url : (isset($_POST['mgd_giveaway_return_url']) ? esc_url_raw((string) wp_unslash($_POST['mgd_giveaway_return_url'])) : home_url('/'));
         $return_url = wp_validate_redirect($return_url, home_url('/'));
         $return_url = remove_query_arg(array('mgd_giveaway_success', 'mgd_form'), $return_url);
@@ -1433,12 +1452,14 @@ class MGD_Giveaway_Plugin
 
     private function passes_spam_check($form_id)
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Private Hilfe, ausschließlich nach check_admin_referer im Formular-Handler aufgerufen.
         $honeypot = isset($_POST['mgd_giveaway_website']) ? sanitize_text_field(wp_unslash($_POST['mgd_giveaway_website'])) : '';
         if ('' !== $honeypot) {
             $this->add_log('warning', 'spam_rejected', 'Spam-Schutz: Honeypot ausgefüllt.', array('form_id' => $form_id));
             return false;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Private Hilfe, ausschließlich nach check_admin_referer im Formular-Handler aufgerufen.
         $token = isset($_POST['mgd_giveaway_started']) ? sanitize_text_field(wp_unslash($_POST['mgd_giveaway_started'])) : '';
         $decoded = base64_decode($token, true);
         if (!$decoded || false === strpos($decoded, '|')) {
@@ -1464,10 +1485,12 @@ class MGD_Giveaway_Plugin
 
     public function handle_masked_download()
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Öffentlicher Download verwendet statt einer kontogebundenen Nonce ein signiertes, befristetes Token; Prüfung direkt nach dem Lesen.
         if (empty($_GET['mgd_giveaway_download'])) {
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Öffentlicher Download verwendet statt einer kontogebundenen Nonce ein signiertes, befristetes Token; Prüfung direkt nach dem Lesen.
         $token = sanitize_text_field((string) wp_unslash($_GET['mgd_giveaway_download']));
         $payload = $this->verify_download_token($token, $this->download_token_max_age);
 
@@ -1531,10 +1554,12 @@ class MGD_Giveaway_Plugin
 
     public function handle_double_opt_in_confirm()
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- E-Mail-Bestätigung verwendet ein signiertes, befristetes Token; Bindung an Einsendung und E-Mail wird direkt danach geprüft.
         if (empty($_GET['mgd_giveaway_confirm'])) {
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- E-Mail-Bestätigung verwendet ein signiertes, befristetes Token; Bindung an Einsendung und E-Mail wird direkt danach geprüft.
         $token = sanitize_text_field((string) wp_unslash($_GET['mgd_giveaway_confirm']));
         $payload = $this->verify_download_token($token, $this->confirm_token_max_age);
         if (!$payload || empty($payload['form_id']) || empty($payload['submission_id']) || empty($payload['email'])) {
@@ -1549,6 +1574,7 @@ class MGD_Giveaway_Plugin
             wp_die(esc_html__('Bestätigungslink ist ungültig.', 'mgd-giveaway'));
         }
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Signierter Bestätigungslink: aktuellen Kontaktstatus direkt aus eigener Tabelle prüfen; keine personenbezogenen Bestätigungsdaten cachen.
         $submission = $wpdb->get_row($wpdb->prepare('SELECT * FROM %i WHERE id = %d AND form_id = %d', $this->submission_table, (int) $payload['submission_id'], (int) $payload['form_id']));
         if (!$submission || !hash_equals((string) $submission->email, (string) $payload['email'])) {
             status_header(404);
@@ -1561,6 +1587,7 @@ class MGD_Giveaway_Plugin
         $return_url = !empty($data['_return_url']) ? esc_url_raw($data['_return_url']) : home_url('/');
 
         if ('confirmed' !== $submission->status) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Signierter Bestätigungslink: aktuellen Kontaktstatus direkt aus eigener Tabelle prüfen; keine personenbezogenen Bestätigungsdaten cachen.
             $wpdb->update(
                 $this->submission_table,
                 array('status' => 'confirmed', 'confirmed_at' => current_time('mysql')),
@@ -1653,6 +1680,8 @@ class MGD_Giveaway_Plugin
         $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
         $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? substr(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 0, 255) : '';
 
+        $this->invalidate_stats();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
         $wpdb->insert(
             $this->submission_table,
             array(
@@ -1675,6 +1704,8 @@ class MGD_Giveaway_Plugin
     private function increment_download_count($submission_id)
     {
         global $wpdb;
+        $this->invalidate_stats();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
         $wpdb->query($wpdb->prepare('UPDATE %i SET download_count = download_count + 1 WHERE id = %d', $this->submission_table, $submission_id));
     }
 
@@ -1865,6 +1896,8 @@ class MGD_Giveaway_Plugin
         $allowed_levels = array('info', 'warning', 'error');
         $level = in_array($level, $allowed_levels, true) ? $level : 'info';
 
+        $this->invalidate_stats();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
         $wpdb->insert(
             $this->log_table,
             array(
@@ -1878,41 +1911,68 @@ class MGD_Giveaway_Plugin
         );
     }
 
+    private function stats_cache_key($name)
+    {
+        wp_cache_add_non_persistent_groups(array(self::STATS_CACHE_GROUP));
+        $key = md5($this->submission_table . ':' . $name);
+        $this->stats_cache_keys[$key] = $key;
+        return $key;
+    }
+
+    private function invalidate_stats()
+    {
+        foreach ($this->stats_cache_keys as $key) {
+            wp_cache_delete($key, self::STATS_CACHE_GROUP);
+        }
+    }
+
     private function count_submissions($form_id = 0)
     {
         global $wpdb;
+        $key = $this->stats_cache_key('submissions:' . absint($form_id));
+        $count = wp_cache_get($key, self::STATS_CACHE_GROUP, false, $found);
+        if ($found) { return $count; }
         if ($form_id) {
-            return (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM %i WHERE form_id = %d', $this->submission_table, $form_id));
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Vorbereitete Statistik der eigenen Einsendungstabelle.
+            $count = (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM %i WHERE form_id = %d', $this->submission_table, $form_id));
+        } else {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Gleiche eigene Statistik ohne Formularfilter.
+            $count = (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM %i', $this->submission_table));
         }
-
-        return (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM %i', $this->submission_table));
+        if (!$wpdb->last_error) { wp_cache_set($key, $count, self::STATS_CACHE_GROUP); }
+        return $count;
     }
 
     private function count_logs()
     {
         global $wpdb;
-
-        return (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM %i', $this->log_table));
+        $key = $this->stats_cache_key('logs');
+        $count = wp_cache_get($key, self::STATS_CACHE_GROUP, false, $found);
+        if ($found) { return $count; }
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Vorbereitete Statistik der eigenen Logtabelle.
+        $count = (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM %i', $this->log_table));
+        if (!$wpdb->last_error) { wp_cache_set($key, $count, self::STATS_CACHE_GROUP); }
+        return $count;
     }
 
     private function get_log_storage_usage()
     {
         global $wpdb;
-        $bytes = (int) $wpdb->get_var($wpdb->prepare('SELECT COALESCE(SUM(CHAR_LENGTH(level) + CHAR_LENGTH(event) + CHAR_LENGTH(message) + CHAR_LENGTH(context) + 32), 0) FROM %i', $this->log_table));
-
-        if ($bytes >= 1048576) {
-            return round($bytes / 1048576, 2) . ' MB';
+        $key = $this->stats_cache_key('log-bytes');
+        $bytes = wp_cache_get($key, self::STATS_CACHE_GROUP, false, $found);
+        if (!$found) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Nur Größenaggregation der eigenen Logtabelle, keine Kontaktinhalte im Cache.
+            $bytes = (int) $wpdb->get_var($wpdb->prepare('SELECT COALESCE(SUM(CHAR_LENGTH(level) + CHAR_LENGTH(event) + CHAR_LENGTH(message) + CHAR_LENGTH(context) + 32), 0) FROM %i', $this->log_table));
+            if (!$wpdb->last_error) { wp_cache_set($key, $bytes, self::STATS_CACHE_GROUP); }
         }
-
-        if ($bytes >= 1024) {
-            return round($bytes / 1024, 2) . ' KB';
-        }
-
+        if ($bytes >= 1048576) { return round($bytes / 1048576, 2) . ' MB'; }
+        if ($bytes >= 1024) { return round($bytes / 1024, 2) . ' KB'; }
         return $bytes . ' B';
     }
 
     private function render_notices()
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur feste Auswahl einer escaped Statusmeldung, keine Änderung.
         if (empty($_GET['mgd_notice'])) {
             return;
         }
@@ -1926,6 +1986,7 @@ class MGD_Giveaway_Plugin
             'import_invalid' => 'CSV-Datei konnte nicht importiert werden.',
             'logs_cleared' => 'Logs geleert.',
         );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur feste Auswahl einer escaped Statusmeldung, keine Änderung.
         $notice = sanitize_key($_GET['mgd_notice']);
 
         if (isset($messages[$notice])) {

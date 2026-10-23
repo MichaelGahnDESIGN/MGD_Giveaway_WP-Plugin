@@ -49,6 +49,7 @@ No analytics or telemetry service is included. WordPress communicates with WordP
 == Changelog ==
 
 = 0.0.37 =
+* Load form resources on demand, retain late shortcode support, cache request statistics and validate CSV upload fields individually.
 * Prepared a WordPress.org candidate with native updates, local assets and reviewed public credits.
 
 == Upgrade Notice ==

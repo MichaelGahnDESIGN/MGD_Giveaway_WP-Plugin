@@ -1,0 +1,46 @@
+# Geprüfte statische Einzel-Ausnahmen
+
+Die nachfolgende Liste zeigt alle PHPCS-Einzel-Ausnahmen im tatsächlich gebauten Paket, einschließlich schon zuvor vorhandener Stellen. Kein phpcs:disable und keine globale Abschaltung von Plugin-Check-Prüfgruppen. Die konkreten Gründe stehen direkt am betroffenen Zugriff. Die Code-Ausnahmen müssen bei künftigen Änderungen erneut geprüft werden; sie sind keine pauschale Freigabe ähnlicher neuer Zugriffe.
+
+- `includes/class-mgd-giveaway-plugin.php:99` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Nur bei Deinstallation: eigene Tabellen entfernen; kein Lese-Cache.
+- `includes/class-mgd-giveaway-plugin.php:101` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Nur bei Deinstallation: eigene Tabellen entfernen; kein Lese-Cache.
+- `includes/class-mgd-giveaway-plugin.php:338` – WordPress.Security.NonceVerification.Recommended -- Nur Anzeige des autorisierten Editors; Speichern erfolgt separat mit Nonce.
+- `includes/class-mgd-giveaway-plugin.php:344` – WordPress.Security.NonceVerification.Recommended -- Nur Anzeige des autorisierten Editors; Speichern erfolgt separat mit Nonce.
+- `includes/class-mgd-giveaway-plugin.php:588` – WordPress.Security.NonceVerification.Recommended -- Nur Suchfilter der autorisierten Liste, keine Zustandsänderung.
+- `includes/class-mgd-giveaway-plugin.php:591` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
+- `includes/class-mgd-giveaway-plugin.php:662` – WordPress.Security.NonceVerification.Recommended -- Nur Such- und Anzeigefilter, keine Zustandsänderung.
+- `includes/class-mgd-giveaway-plugin.php:664` – WordPress.Security.NonceVerification.Recommended -- Nur Such- und Anzeigefilter, keine Zustandsänderung.
+- `includes/class-mgd-giveaway-plugin.php:668` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
+- `includes/class-mgd-giveaway-plugin.php:1018` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
+- `includes/class-mgd-giveaway-plugin.php:1037` – WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- PHP-Uploadpfad unverändert prüfen; is_uploaded_file() unten verhindert beliebige lokale Pfade.
+- `includes/class-mgd-giveaway-plugin.php:1049` – WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Größenbegrenzter, mit is_uploaded_file geprüfter CSV-Stream; fgetcsv erhält mehrzeilige Felder.
+- `includes/class-mgd-giveaway-plugin.php:1068` – WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Den geprüften CSV-Stream wieder schließen.
+- `includes/class-mgd-giveaway-plugin.php:1085` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
+- `includes/class-mgd-giveaway-plugin.php:1107` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
+- `includes/class-mgd-giveaway-plugin.php:1110` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
+- `includes/class-mgd-giveaway-plugin.php:1124` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Autorisierte Verwaltung bzw. Export eigener Daten: aktuelle Kontaktdaten nur für diese Aktion lesen, kein personenbezogener Exportcache.
+- `includes/class-mgd-giveaway-plugin.php:1137` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
+- `includes/class-mgd-giveaway-plugin.php:1202` – WordPress.Security.NonceVerification.Recommended -- Nur Ausgabe eines zeitlich begrenzten Ergebnisses über zufälliges Token, keine Änderung.
+- `includes/class-mgd-giveaway-plugin.php:1204` – WordPress.Security.NonceVerification.Recommended -- Nur Ausgabe eines zeitlich begrenzten Ergebnisses über zufälliges Token, keine Änderung.
+- `includes/class-mgd-giveaway-plugin.php:1209` – WordPress.Security.NonceVerification.Recommended -- Nur Ausgabe eines zeitlich begrenzten Ergebnisses über zufälliges Token, keine Änderung.
+- `includes/class-mgd-giveaway-plugin.php:1255` – WordPress.Security.NonceVerification.Missing -- Private Hilfe nach geprüfter Formular-Nonce; Ziel wird zusätzlich mit wp_validate_redirect begrenzt.
+- `includes/class-mgd-giveaway-plugin.php:1455` – WordPress.Security.NonceVerification.Missing -- Private Hilfe, ausschließlich nach check_admin_referer im Formular-Handler aufgerufen.
+- `includes/class-mgd-giveaway-plugin.php:1462` – WordPress.Security.NonceVerification.Missing -- Private Hilfe, ausschließlich nach check_admin_referer im Formular-Handler aufgerufen.
+- `includes/class-mgd-giveaway-plugin.php:1488` – WordPress.Security.NonceVerification.Recommended -- Öffentlicher Download verwendet statt einer kontogebundenen Nonce ein signiertes, befristetes Token; Prüfung direkt nach dem Lesen.
+- `includes/class-mgd-giveaway-plugin.php:1493` – WordPress.Security.NonceVerification.Recommended -- Öffentlicher Download verwendet statt einer kontogebundenen Nonce ein signiertes, befristetes Token; Prüfung direkt nach dem Lesen.
+- `includes/class-mgd-giveaway-plugin.php:1550` – WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Autorisierter lokaler Dateidownload als Stream; kein vollständiges Einlesen großer PDFs in den Arbeitsspeicher.
+- `includes/class-mgd-giveaway-plugin.php:1557` – WordPress.Security.NonceVerification.Recommended -- E-Mail-Bestätigung verwendet ein signiertes, befristetes Token; Bindung an Einsendung und E-Mail wird direkt danach geprüft.
+- `includes/class-mgd-giveaway-plugin.php:1562` – WordPress.Security.NonceVerification.Recommended -- E-Mail-Bestätigung verwendet ein signiertes, befristetes Token; Bindung an Einsendung und E-Mail wird direkt danach geprüft.
+- `includes/class-mgd-giveaway-plugin.php:1577` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Signierter Bestätigungslink: aktuellen Kontaktstatus direkt aus eigener Tabelle prüfen; keine personenbezogenen Bestätigungsdaten cachen.
+- `includes/class-mgd-giveaway-plugin.php:1590` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Signierter Bestätigungslink: aktuellen Kontaktstatus direkt aus eigener Tabelle prüfen; keine personenbezogenen Bestätigungsdaten cachen.
+- `includes/class-mgd-giveaway-plugin.php:1684` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
+- `includes/class-mgd-giveaway-plugin.php:1708` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
+- `includes/class-mgd-giveaway-plugin.php:1847` – WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Native CSV-Ausgabe an den bereits autorisierten Download-Response.
+- `includes/class-mgd-giveaway-plugin.php:1859` – WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Den CSV-Ausgabestream schließen.
+- `includes/class-mgd-giveaway-plugin.php:1900` – WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Eigene Tabelle; Anfragestatistiken werden bei dieser Schreibaktion invalidiert.
+- `includes/class-mgd-giveaway-plugin.php:1936` – WordPress.DB.DirectDatabaseQuery.DirectQuery -- Vorbereitete Statistik der eigenen Einsendungstabelle.
+- `includes/class-mgd-giveaway-plugin.php:1939` – WordPress.DB.DirectDatabaseQuery.DirectQuery -- Gleiche eigene Statistik ohne Formularfilter.
+- `includes/class-mgd-giveaway-plugin.php:1952` – WordPress.DB.DirectDatabaseQuery.DirectQuery -- Vorbereitete Statistik der eigenen Logtabelle.
+- `includes/class-mgd-giveaway-plugin.php:1964` – WordPress.DB.DirectDatabaseQuery.DirectQuery -- Nur Größenaggregation der eigenen Logtabelle, keine Kontaktinhalte im Cache.
+- `includes/class-mgd-giveaway-plugin.php:1975` – WordPress.Security.NonceVerification.Recommended -- Nur feste Auswahl einer escaped Statusmeldung, keine Änderung.
+- `includes/class-mgd-giveaway-plugin.php:1989` – WordPress.Security.NonceVerification.Recommended -- Nur feste Auswahl einer escaped Statusmeldung, keine Änderung.

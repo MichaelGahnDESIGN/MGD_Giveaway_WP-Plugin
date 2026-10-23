@@ -47,3 +47,15 @@ Die nachträgliche Prüfung filtert Nonce-/Formulareingaben am Eingang, verwende
 Prüfplan: feste Paketliste bauen, Metadaten-/Updatevertrag prüfen, PHP-Syntax prüfen, Paket in der lokalen Testkopie installieren, 22 Schutzgrenzen-/Datenbanktests und die sieben Backends prüfen, offiziellen Plugin Check ausführen und ZIP gegen CI-Artefakt vergleichen. Rückfall bleibt der vorige Commit des separaten Kandidatenbranches; GitHub-main und Kundeninstallationen werden dadurch nicht geändert.
 
 Die aktuelle Einordnung der verbleibenden Meldungen steht in `wordpress-org/ERGEBNIS.md`. Multisite, umfassende Screenreader-Abnahme und ein echter MCP-Client mit offiziellem Adapter bleiben außerhalb dieses Nachweises.
+
+## Warnungen gezielt nacharbeiten
+
+Ziel: die verbliebenen Plugin-Check-Hinweise fachlich beheben. Dazu gehören gezielte Abfrage-Caches mit sofortiger Invalidierung, bedarfsweises Laden der Giveaway-Ressourcen und eine begrenzte, geprüfte Behandlung unvermeidbarer Direktabfragen und lesender URL-Parameter. Keine globale Regelunterdrückung.
+
+Nachweise: Wiederholungsabfragen und Invalidierung mit echten Daten, persönliche Feeds getrennt prüfen, token-/noncegeschützte Wege prüfen, native Frontend-Ansichten und dynamischen Shortcode rendern; danach vollständiger offizieller Plugin Check und bytegleiche CI-ZIPs. Vorige Kandidatencommits und Pakete bleiben als Rückfall erhalten. Änderungen betreffen nur die separate Verzeichnisfassung, keine Live-Datenmigration.
+
+## Ergebnis der gezielten Warnungsnacharbeit
+
+Nur Statistiken zu Einsendungen, Loganzahl und Loggröße werden während einer Anfrage zwischengespeichert. Schreibaktionen invalidieren diese Werte. Kontaktlisten, Exporte und signierte Bestätigungswege lesen weiterhin frische Daten ohne personenbezogenen Exportcache. Die Einzel-Ausnahmen benennen jeweils den Grund. Die Rohstruktur von $_FILES wird nicht mehr übernommen: Uploadfehler, Typen, Endung, Größe und der echte temporäre PHP-Uploadpfad werden vor dem CSV-Stream geprüft. Das Frontend lädt CSS und JS nur für erkannte Shortcodes bzw. direkt beim Rendern; späte Ausgaben drucken einen noch ausstehenden registrierten Stil im Footer.
+
+Es gibt jetzt ausdrücklich offengelegte statische Einzel-Ausnahmen. Die früheren Aussagen zu unverändert erhaltenen Rohmeldungen beschreiben die damaligen Läufe; der neue Stand enthält die fachlich geprüften Code-Anmerkungen. Keine Laufzeit-/Performance-Prüfung wird ausgeschaltet. Vollständige Liste: `wordpress-org/GEPRUEFTE-AUSNAHMEN.md`; neuer Bericht: `wordpress-org/ERGEBNIS.md`.
