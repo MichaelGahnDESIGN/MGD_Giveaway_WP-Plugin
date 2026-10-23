@@ -1,33 +1,24 @@
-# Plugin Check – lokaler CLI-Lauf
+# Plugin Check – aktualisierter lokaler Lauf
 
-Stand: 23.10.2026. WordPress 7.1.3 / PHP 8.3 / Plugin Check 2.1.0.
+Stand: 23.10.2026. Kandidat 0.0.37; WordPress 7.1.3, PHP 8.3, offizieller Plugin Check 2.1.0 mit Runtime-Bootstrap.
 
-Aufruf mit Runtime-Bootstrap:
-
-```sh
-wp --require=wp-content/plugins/plugin-check/cli.php plugin check mgd-giveaway --slug=mgd-giveaway --format=json
-```
-
-Lokaler CLI-Lauf: **0 Fehler, 91 Warnungen**, Exit-Code 0. Die vollständigen unveränderten Meldungen stehen in `plugin-check.txt`. Keine Checks, Warnungsgruppen oder Fehlercodes wurden für den Lauf ausgeschlossen.
-
-## Warnungsgruppen
+**0 Fehler, 63 Warnungen.** Alle Prüfgruppen aktiv, keine Fehlercodes ausgeschlossen. Vollständiger Bericht: `plugin-check.txt`.
 
 - `WordPress.Security.NonceVerification.Recommended`: 20
 - `WordPress.DB.DirectDatabaseQuery.DirectQuery`: 18
 - `WordPress.DB.DirectDatabaseQuery.NoCaching`: 16
-- `PluginCheck.Security.DirectDB.UnescapedDBParameter`: 11
-- `WordPress.DB.PreparedSQL.InterpolatedNotPrepared`: 11
-- `WordPress.Security.ValidatedSanitizedInput.InputNotSanitized`: 7
 - `WordPress.Security.NonceVerification.Missing`: 6
 - `WordPress.DB.DirectDatabaseQuery.SchemaChange`: 2
+- `WordPress.Security.ValidatedSanitizedInput.InputNotSanitized`: 1
 
-Die GitHub Action prüft das gebaute Paket zusätzlich in einer eigenen wp-env-Installation. Sie kann weitere Laufzeit- und Performance-Hinweise ausgeben. Die lokalen Zahlen sind deshalb nicht als Gesamtzahl sämtlicher CI-Annotationen zu lesen. Die endgültigen CI-Rohberichte stehen als Artefakte des Workflows zur Verfügung und werden in der zentralen Paketübergabe mitgeliefert.
+Die CI läuft zusätzlich mit einer eigenen wp-env-Installation und kann andere Laufzeit-/Performance-Hinweise liefern. Die Gesamtübergabe bewahrt beide Rohberichte getrennt auf. Ein grüner Lauf ist keine WordPress.org-Zulassung.
 
-## Zusätzliche Belege
+## Prüfung der Resthinweise
 
-- Alle sieben Kandidaten gemeinsam aktiviert, Frontend HTTP 200.
-- Acht Integrationstests: Herstellerlink aus/Opt-in, Textgrenzen, Entwurf, Menü, Formular-Nonce und Pflichtzustimmung.
-- Nativer Updatekanal und vier Grafikgrößen mit eigenem Paketvertrag geprüft.
-- Kein Live-Deployment, keine WordPress.org-Einreichung.
+Eigene Plugin-Tabellen werden über das WordPress-Präfix und feste Namen erzeugt. Die Laufzeitabfragen binden Tabellenbezeichner mit `%i` und Werte mit `%s`/`%d`. Direkte Abfragen bleiben für eigene Tabellen notwendig. Ein Cache für Empfänger-, Lese-, Audit- und Downloadstatus wurde nicht ergänzt: Änderungen müssen unmittelbar sichtbar bleiben. Hinweise zu Schemaänderungen gehören zur Installation bzw. ausdrücklich gewählten Datenlöschung. Die SQL-Änderungen wurden mit echten Datenbankzugriffen in der lokalen Testkopie geprüft.
 
-Die Warnungen sind Hinweise für die manuelle Prüfung und kein automatisches Freigabezertifikat. Einordnung und Wechselhinweise stehen in `../WORDPRESS-ORG.md`.
+Nonce-Hinweise betreffen lesende Listen-/Statusfilter, signierte Download- und Bestätigungstokens sowie private Hilfsmethoden, die nach der Nonce-Prüfung des Formular-Handlers aufgerufen werden. Exporte, Löschaktionen, Import und Einstellungen besitzen eigene Capability- und Nonce-Prüfungen. `$_FILES` wird als Uploadstruktur gelesen; Dateiname, Größe, Erweiterung und `is_uploaded_file()` werden geprüft, bevor der begrenzte CSV-Stream geöffnet wird. Der temporäre Uploadpfad wird nicht in einen frei angegebenen Dateipfad umgewandelt. Formulare mit Nonce brauchen eine Ausnahme von dauerhaftem Seiten-Cache.
+
+## Weitere Belege
+
+Sieben Backends tatsächlich im Browser geöffnet, keine JavaScript-Ausnahmen; echte Screenshots mit künstlichen Daten. 22 lokale Integrationstests zu Formularschutz, Herstellerlink, Entwurf, Menü und privaten/öffentlichen Daten. PHP-Syntax und Verzeichnis-Paketvertrag geprüft. Kein Produktivsystem verändert und keine Einreichung ausgelöst.
