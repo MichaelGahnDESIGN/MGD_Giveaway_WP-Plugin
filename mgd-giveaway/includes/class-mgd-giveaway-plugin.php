@@ -40,7 +40,7 @@ class MGD_Giveaway_Plugin
         add_action('admin_menu', array($this, 'register_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         add_action('wp_enqueue_scripts', array($this, 'prepare_frontend_assets'));
-        add_action('wp_footer', array($this, 'print_late_frontend_styles'), 1);
+        add_action('wp_footer', array($this, 'print_late_frontend_assets'), PHP_INT_MAX);
         add_action('template_redirect', array($this, 'handle_masked_download'));
         add_action('template_redirect', array($this, 'handle_double_opt_in_confirm'));
         add_shortcode('mgd_giveaway', array($this, 'render_shortcode'));
@@ -202,10 +202,14 @@ class MGD_Giveaway_Plugin
         }
     }
 
-    public function print_late_frontend_styles()
+    public function print_late_frontend_assets()
     {
         if (wp_style_is('mgd-giveaway-frontend', 'enqueued') && !wp_style_is('mgd-giveaway-frontend', 'done')) {
             wp_print_styles('mgd-giveaway-frontend');
+        }
+        // Auch Widgets nach dem normalen Footer-Skripttermin erhalten ihre Dateien genau einmal.
+        if (wp_script_is('mgd-giveaway-frontend', 'enqueued') && !wp_script_is('mgd-giveaway-frontend', 'done')) {
+            wp_print_scripts(array('mgd-giveaway-frontend'));
         }
     }
 
