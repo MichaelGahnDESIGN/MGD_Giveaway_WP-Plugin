@@ -13,3 +13,6 @@ PlayTest/
 *.sql
 *.sql.gz
 *.dump
+
+/build/wordpress-org/
+/artifacts/wordpress-org/
