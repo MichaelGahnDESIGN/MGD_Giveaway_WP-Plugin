@@ -1,4 +1,4 @@
-# Plugin Check – Ergebnis
+# Plugin Check – lokaler CLI-Lauf
 
 Stand: 23.10.2026. WordPress 7.1.3 / PHP 8.3 / Plugin Check 2.1.0.
 
@@ -8,7 +8,7 @@ Aufruf mit Runtime-Bootstrap:
 wp --require=wp-content/plugins/plugin-check/cli.php plugin check mgd-giveaway --slug=mgd-giveaway --format=json
 ```
 
-Ergebnis: **0 Fehler, 91 Warnungen**, Exit-Code 0. Die vollständigen unveränderten Meldungen stehen in `plugin-check.txt`. Keine Checks, Warnungsgruppen oder Fehlercodes wurden für den Lauf ausgeschlossen.
+Lokaler CLI-Lauf: **0 Fehler, 91 Warnungen**, Exit-Code 0. Die vollständigen unveränderten Meldungen stehen in `plugin-check.txt`. Keine Checks, Warnungsgruppen oder Fehlercodes wurden für den Lauf ausgeschlossen.
 
 ## Warnungsgruppen
 
@@ -20,6 +20,8 @@ Ergebnis: **0 Fehler, 91 Warnungen**, Exit-Code 0. Die vollständigen unverände
 - `WordPress.Security.ValidatedSanitizedInput.InputNotSanitized`: 7
 - `WordPress.Security.NonceVerification.Missing`: 6
 - `WordPress.DB.DirectDatabaseQuery.SchemaChange`: 2
+
+Die GitHub Action prüft das gebaute Paket zusätzlich in einer eigenen wp-env-Installation. Sie kann weitere Laufzeit- und Performance-Hinweise ausgeben. Die lokalen Zahlen sind deshalb nicht als Gesamtzahl sämtlicher CI-Annotationen zu lesen. Die endgültigen CI-Rohberichte stehen als Artefakte des Workflows zur Verfügung und werden in der zentralen Paketübergabe mitgeliefert.
 
 ## Zusätzliche Belege
 

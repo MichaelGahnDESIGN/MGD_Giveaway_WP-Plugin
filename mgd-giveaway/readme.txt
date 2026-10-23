@@ -10,6 +10,10 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Create ebook and PDF download forms with consent fields and protected links.
 
+== Description ==
+
+Create ebook and PDF download forms with consent fields and protected links.
+
 Features:
 
 * Build forms with text, email, checkbox and privacy fields.
@@ -17,10 +21,6 @@ Features:
 * Export and delete contact data from the administration area.
 * Render privacy information using the configured page.
 * Form submission requires a valid nonce; exclude the form page from long-lived full-page caching.
-
-== Description ==
-
-Create ebook and PDF download forms with consent fields and protected links.
 
 This edition uses native WordPress.org updates. There is no GitHub self-updater or external plugin installer. Updates become available after approval and publication in the directory.
 
