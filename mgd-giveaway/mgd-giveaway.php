@@ -25,6 +25,7 @@ define('MGD_GIVEAWAY_URL', plugin_dir_url(__FILE__));
 
 require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-giveaway-plugin.php';
 require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-giveaway-updater.php';
+require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-wordpress-plugin-catalog.php';
 
 // Der öffentliche Release-Kanal ist unabhängig von Formularen und Besuchern.
 // Nur WordPress' Updateprüfung darf ihn aufrufen; keine Frontend-Daten werden versendet.
@@ -35,6 +36,7 @@ register_uninstall_hook(__FILE__, array('MGD_Giveaway_Plugin', 'uninstall'));
 
 add_action('plugins_loaded', function () {
     MGD_Giveaway_Plugin::instance();
+    (new MGD_WordPress_Plugin_Catalog_V4())->register('mgd-giveaway');
 });
 
 // Icon in der Pluginverwaltung.

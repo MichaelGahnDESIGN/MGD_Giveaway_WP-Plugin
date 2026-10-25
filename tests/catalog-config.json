@@ -1,0 +1,6 @@
+{
+  "runtime": "mgd-giveaway",
+  "main": "mgd-giveaway.php",
+  "version": "0.0.37",
+  "slug": "mgd-giveaway"
+}
