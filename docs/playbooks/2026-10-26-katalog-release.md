@@ -31,4 +31,10 @@ Der zuerst gefundene ältere Builder-Checkout enthielt den Sync-Befehl noch nich
 - Pfad: `build/0.0.38/mgd-giveaway.zip`, 391215 Bytes, 42 Dateien.
 - SHA-256: `9ce680e0d03c7fa988587e8ea62b795b981d59aa6e26b08a15d5518139a52585`.
 - Das vorherige `build/mgd-giveaway.zip` und der veröffentlichte Release 0.0.37 wurden nicht überschrieben.
-- Paket, Syntax und lokale Vertragstests sind geprüft. GitHub-CI, Commit/Push, Veröffentlichung, heruntergeladenes Release-Paket und Einzelplugin-Browserprüfung sind in diesem Vorbereitungslauf ausdrücklich noch offen und werden vom Hauptagenten übernommen.
+- Paket, Syntax und lokale Vertragstests wurden in der Vorbereitung geprüft; der folgende Abschluss ergänzt die tatsächliche Veröffentlichung.
+
+## Abschluss durch den Hauptagenten
+
+Die entfernte Dependabot-Konfiguration wurde in `97040c7` erhalten und mit dem lokalen Katalogstand zusammengeführt. Hauptbranch- und Release-CI für PHP 7.4 und 8.4 sind erfolgreich. [Release 0.0.38](https://github.com/MichaelGahnDESIGN/MGD_Giveaway_WP-Plugin/releases/tag/v0.0.38) ist veröffentlicht. Das zurückgeladene ZIP hat SHA-256 `9851e28f86e89674bb14cdd616ecc85998141233ffba91fcd87d20a1efee35fa`; alle 42 Dateien stimmen bytegleich mit den Quellen überein. Eine passende öffentliche Prüfsummendatei wurde ergänzt. Die CI-Dateizeitstempel erklären die Abweichung zum lokalen ZIP-Hash.
+
+Der Katalog wurde im Browser mit ausschließlich Giveaway als aktivem MGD-Plugin geöffnet: sieben Karten, 17 Bilder und Katalogskript aus dem eigenen Pluginordner. Anschließend wurde Release 0.0.37 erneut eingesetzt und über ein echtes GitHub-Update nativ auf 0.0.38 aktualisiert. Zwölf fachliche Optionen blieben unverändert; `mgd_giveaway_version` wechselte separat geprüft von 0.0.37 auf 0.0.38. Kein Kunden-/Plattform-Deployment. Das Ziel dieses Playbooks ist erreicht.
