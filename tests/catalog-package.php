@@ -14,7 +14,7 @@ foreach ($metadata as $repo => $item) {
     mgd_catalog_assert($item['repository'] === $repo && $item['tier'] === 'free', 'Bekannte kostenlose Einträge');
     $file = $runtime . '/assets/plugin-catalog/icons/' . $item['icon'];
     mgd_catalog_assert(is_file($file) && filesize($file) > 100, 'Lokales Icon ' . $repo);
-    mgd_catalog_assert(!str_contains(file_get_contents($file), 'https://'), 'Kein externer Bildabruf im Icon');
+    mgd_catalog_assert(false === strpos(file_get_contents($file), 'https://'), 'Kein externer Bildabruf im Icon');
     $picture = $runtime . '/assets/plugin-catalog/backgrounds/' . pathinfo($item['icon'], PATHINFO_FILENAME) . '.webp';
     $size = is_file($picture) ? getimagesize($picture) : false;
     mgd_catalog_assert($size && $size[0] === 1080 && $size[1] === 360 && $size['mime'] === 'image/webp', 'Lokales Kartenmotiv ' . $repo);

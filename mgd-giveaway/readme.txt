@@ -4,7 +4,7 @@ Tags: download, forms, ebook, pdf, shortcode
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 0.0.37
+Stable tag: 0.0.38
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,16 @@ Anmeldungen werden in der Mail-Liste gespeichert und können als CSV importiert 
 
 Der Formular-Editor enthält einen modernen Builder mit Tabs, Element-Palette, Formular-Canvas, Drag & Drop Feldkarten, Feld-Inspector, Datenschutz-Element und integriertem Spam-Schutz mit Honeypot und Zeitprüfung.
 
+Unter „Weitere Plugins“ ist auch bei alleiniger Installation dieselbe gemeinsame MGD-Plugin-Kollektion erreichbar: sieben Karten mit eigenen Icons und Hintergrundmotiven, Suche, Kategorien und lokalen Detailansichten. Weitere aktive MGD-Plugins teilen diese Ansicht. Eine Installation wird nur nach bewusstem Klick und mit der entsprechenden WordPress-Berechtigung gestartet; heruntergeladene Plugins werden nicht automatisch aktiviert.
+
+== Externe Dienste in dieser GitHub-Ausgabe ==
+
+Die Plugin-Kollektion liest öffentliche Metadaten von https://theme.michael-gahn.de/api/catalog/plugins.json und öffentliche Release-Daten der festgelegten GitHub-Repositories. Diese Abfragen erfolgen im Verwaltungsbereich, nicht beim Besuch einer Formularseite. Der jeweilige Dienst erhält die Server-IP und technische HTTP-Anfragedaten. Formularinhalte, Kontakte und Zugangsdaten werden darüber nicht übertragen. Bilder, Icons und die Darstellung der Kollektion liegen im Plugin; ein lokaler Ersatzstand bleibt bei einer nicht erreichbaren Katalogquelle nutzbar.
+
+GitHub wird auch bei der nativen Updateprüfung kontaktiert. Pakete werden erst nach einer ausdrücklich ausgelösten Installation bzw. Aktualisierung heruntergeladen. Plattform: https://theme.michael-gahn.de – Projektinformationen: https://github.com/MichaelGahnDESIGN/MGD_Giveaway_WP-Plugin – GitHub-Datenschutz: https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement
+
+Eine spätere WordPress.org-Ausgabe wird getrennt vorbereitet und enthält weder den externen Installer noch den GitHub-Updater dieser Ausgabe.
+
 == Installation ==
 
 1. Plugin-Ordner `mgd-giveaway` nach `wp-content/plugins/` kopieren oder ZIP hochladen.
@@ -26,6 +36,17 @@ Der Formular-Editor enthält einen modernen Builder mit Tabs, Element-Palette, F
 4. Shortcode wie `[mgd_giveaway id="123"]` in eine Seite einfügen.
 
 == Changelog ==
+
+= 0.0.38 =
+* Gemeinsame MGD-Plugin-Kollektion mit sieben Karten, lokalen Icons, Hintergrundmotiven, Suche und Details vollständig im Release-Paket enthalten.
+* Paketmanifest und automatische Prüfung verhindern fehlende Standardbilder im GitHub-Release.
+* Keine Änderung an Formularen, Kontakten, Mailversand oder Datenbankstruktur.
+
+= 0.0.37 =
+* Manuellen MGD-Updateprüfknopf, Herstellerlinks und lokale Plugin-Details ergänzt.
+
+= 0.0.36 =
+* Lokales Plugin-Icon ergänzt.
 
 = 0.0.35 =
 * Öffentliche GitHub-Releases erscheinen als reguläre Updates im WordPress-Backend.

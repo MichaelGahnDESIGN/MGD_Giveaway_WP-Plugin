@@ -19,7 +19,7 @@ if ! grep -Fqx " * Version: $version" "$php_file" \
   exit 1
 fi
 
-output_dir="$repo_dir/build"
+output_dir="${2:-$repo_dir/build}"
 mkdir -p "$output_dir"
 output_file="$output_dir/mgd-giveaway.zip"
 if [[ -e "$output_file" ]]; then

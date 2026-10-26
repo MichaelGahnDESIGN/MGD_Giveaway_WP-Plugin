@@ -24,6 +24,11 @@ jobs:
         run: find mgd-giveaway tests -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Updater-Vertrag prüfen
         run: php tests/updater-test.php
+      - name: Plugin-Icon und vollständige Kollektion prüfen
+        run: |
+          php tests/plugin-icon-test.php
+          php tests/catalog-package.php
+          php tests/catalog-update-state.php
       - name: Release-Paket bauen
         shell: bash
         run: |
@@ -37,6 +42,8 @@ jobs:
         run: |
           test "$(unzip -Z1 build/mgd-giveaway.zip | grep -c '^mgd-giveaway/mgd-giveaway.php$')" -eq 1
           unzip -tq build/mgd-giveaway.zip
+          python3 scripts/check_plugin_ready.py . --zip build/mgd-giveaway.zip
+          python3 scripts/check-catalog-zip.py build/mgd-giveaway.zip
       - if: matrix.php == '8.4'
         uses: actions/upload-artifact@v4
         with:

@@ -1,5 +1,9 @@
 # Versionen
 
+## 2026-10-26 – Version 0.0.38 (für Veröffentlichung vorbereitet)
+
+Die gemeinsame MGD-Plugin-Kollektion wird vollständig mit Icons, sieben Hintergrundmotiven und lokaler Oberfläche paketiert. Giveaway bietet die Ansicht damit auch ohne zusätzliches MGD-Plugin. Paketmanifest und gezielte CI-Prüfungen sichern die Vollständigkeit ab. Formular-/Kontaktdaten, E-Mail-Versand und Datenbankstruktur ändern sich nicht. Lokale Prüfungen und noch offene Release-/Browsernachweise stehen im [Playbook](../docs/playbooks/2026-10-26-katalog-release.md). Rückfall: vorheriges Release-ZIP 0.0.37 und bei einer echten Website das vorher angelegte vollständige Backup.
+
 ## 2026-09-30 - Version 0.0.35 (vorbereitet, noch kein veröffentlichtes Release)
 
 Beschreibung: GitHub-Release-Updates über WordPress' regulären Plugin-Updater; reproduzierbarer Paketbau mit Versions- und Ordnerprüfung.

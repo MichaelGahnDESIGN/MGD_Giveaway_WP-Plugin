@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "platform": "wordpress",
+  "channel": "github",
+  "runtime": "mgd-giveaway",
+  "packageRoot": "mgd-giveaway",
+  "externalCatalog": true,
+  "icon": "mgd-giveaway/assets/mgd-plugin-icon.svg",
+  "cardBackground": "mgd-giveaway/assets/plugin-catalog/backgrounds/giveaway.webp",
+  "readme": "mgd-giveaway/readme.txt",
+  "changelog": "CHANGELOG.md",
+  "documentation": "docs/PLUGIN-KOLLEKTION.md"
+}

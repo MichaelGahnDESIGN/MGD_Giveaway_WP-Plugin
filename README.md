@@ -22,7 +22,13 @@ Ein WordPress-Plugin von Michael Gahn DESIGN zum Erstellen von Formularen, die n
 
 ## Das Problem
 
-Wer ein Gratis-eBook oder PDF gegen Anmeldung anbieten möchte, braucht dafür sonst mehrere Bausteine: ein Formular-Plugin, einen Schutz gegen das direkte Verlinken der Datei und meist einen externen Dienst für die Mail-Liste. MGD Giveaway bündelt Formular-Builder, maskierten Download und lokale Mail-Liste in einem Plugin — ohne externe Schriften, Icons, Skripte oder Drittanbieter-Dienste.
+Wer ein Gratis-eBook oder PDF gegen Anmeldung anbieten möchte, braucht dafür sonst mehrere Bausteine: ein Formular-Plugin, einen Schutz gegen das direkte Verlinken der Datei und meist einen externen Dienst für die Mail-Liste. MGD Giveaway bündelt Formular-Builder, maskierten Download und lokale Mail-Liste in einem Plugin. Formular- und Kontaktdaten bleiben auf dem eigenen WordPress-Server. Schriften, Icons und Skripte werden lokal ausgeliefert.
+
+## Gemeinsame MGD-Plugin-Kollektion ab 0.0.38
+
+Unter **MGD Giveaway → Weitere Plugins** erscheint dieselbe gemeinsame Empfehlungsseite wie in den anderen MGD-Plugins. Sie ist vollständig in diesem Paket enthalten und funktioniert auch ohne ein weiteres MGD-Plugin: sieben Karten mit eigenen Icons und Hintergrundbildern, Suche, Kategorien und Details. Mehrere aktive MGD-Plugins teilen die Seite; es wird kein fremder PHP- oder JavaScript-Code nachgeladen.
+
+Die öffentliche Liste kommt aus `theme.michael-gahn.de`; GitHub liefert geprüfte Release-Metadaten. Bei Ausfall bleibt ein lokaler Ersatzstand nutzbar. Abfragen finden im Verwaltungsbereich statt und übertragen keine Formularinhalte oder Kontakte. Dienstanbieter erhalten die Server-IP und technische HTTP-Anfragedaten. Installationen und Updates erfordern einen bewussten Klick und passende WordPress-Rechte; installierte Empfehlungen werden nicht automatisch aktiviert. [Einzelheiten und Rückfall](docs/PLUGIN-KOLLEKTION.md).
 
 ## Installation
 
