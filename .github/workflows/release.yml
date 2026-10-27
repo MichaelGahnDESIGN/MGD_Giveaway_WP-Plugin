@@ -46,7 +46,7 @@ jobs:
           python3 scripts/check_plugin_ready.py . --zip build/mgd-giveaway.zip
           python3 scripts/check-catalog-zip.py build/mgd-giveaway.zip
       - if: matrix.php == '8.4'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mgd-giveaway
           path: build/mgd-giveaway.zip
