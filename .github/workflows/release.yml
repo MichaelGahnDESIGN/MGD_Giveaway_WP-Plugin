@@ -29,6 +29,7 @@ jobs:
           php tests/plugin-icon-test.php
           php tests/catalog-package.php
           php tests/catalog-update-state.php
+          php tests/catalog-media.php
       - name: Release-Paket bauen
         shell: bash
         run: |
