@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.0.39 – 2026-10-27
+
+- Icons und Hintergründe der Karten unter „Weitere Plugins" kommen jetzt aus theme.michael-gahn.de. Sie werden vom Server einmal geholt und lokal gespeichert, der Browser lädt nichts extern. Ohne Bild bleibt das mitgelieferte Motiv.
+- Versionen werden ohne führendes „v" angezeigt.
+
 ## 0.0.38 – 2026-10-26
 
 - Gemeinsame Plugin-Kollektion mit sieben Karten, passenden Icons und lokalen Hintergrundmotiven jetzt vollständig im installierbaren Paket.
