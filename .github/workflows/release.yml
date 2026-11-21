@@ -14,14 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['7.4', '8.4']
+        php: ['7.4', '8.1', '8.4']
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
       - name: PHP-Syntax prüfen
-        run: find mgd-giveaway tests -name '*.php' -print0 | xargs -0 -n1 php -l
+        shell: bash
+        run: |
+          # Baukasten braucht 8.1, unter 7.4 wird er gar nicht geladen
+          if [[ "${{ matrix.php }}" == "7.4" ]]; then
+            find mgd-giveaway tests -name '*.php' -not -path 'mgd-giveaway/includes/Kit/*' -print0 | xargs -0 -n1 php -l
+          else
+            find mgd-giveaway tests -name '*.php' -print0 | xargs -0 -n1 php -l
+          fi
       - name: Updater-Vertrag prüfen
         run: php tests/updater-test.php
       - name: Plugin-Icon und vollständige Kollektion prüfen
@@ -41,6 +48,7 @@ jobs:
           bash scripts/build-release.sh "$version"
       - name: Paketstruktur prüfen
         run: |
+          (cd build && sha256sum mgd-giveaway.zip > mgd-giveaway.zip.sha256)
           test "$(unzip -Z1 build/mgd-giveaway.zip | grep -c '^mgd-giveaway/mgd-giveaway.php$')" -eq 1
           unzip -tq build/mgd-giveaway.zip
           python3 scripts/check_plugin_ready.py . --zip build/mgd-giveaway.zip
@@ -49,7 +57,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mgd-giveaway
-          path: build/mgd-giveaway.zip
+          path: |
+            build/mgd-giveaway.zip
+            build/mgd-giveaway.zip.sha256
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -80,6 +90,7 @@ jobs:
               cmp <(unzip -p build/mgd-giveaway.zip "$path") <(unzip -p "$existing" "$path")
             done < <(unzip -Z1 build/mgd-giveaway.zip)
           else
-            gh release create "$GITHUB_REF_NAME" build/mgd-giveaway.zip \
+            (cd build && sha256sum -c mgd-giveaway.zip.sha256)
+            gh release create "$GITHUB_REF_NAME" build/mgd-giveaway.zip build/mgd-giveaway.zip.sha256 \
               --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
           fi

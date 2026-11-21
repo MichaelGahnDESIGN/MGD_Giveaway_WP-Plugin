@@ -1,5 +1,12 @@
 # Änderungen
 
+## 0.1.0 – 2026-11-21
+
+- Neuer Update-Weg über theme.michael-gahn.de, neue Seite Info und Updates (Plugin-Baukasten).
+- Weitere Plugins und Installation melden kommen jetzt vom Baukasten. Der alte GitHub-Updater ist abgeschaltet.
+- Der Baukasten braucht PHP 8.1. Mit älterem PHP läuft der bisherige Update-Weg weiter.
+- Keine Änderung an Formularen, Kontakten, Mailversand oder Datenbank.
+
 ## 0.0.39 – 2026-10-27
 
 - Icons und Hintergründe der Karten unter „Weitere Plugins" kommen jetzt aus theme.michael-gahn.de. Sie werden vom Server einmal geholt und lokal gespeichert, der Browser lädt nichts extern. Ohne Bild bleibt das mitgelieferte Motiv.
