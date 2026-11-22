@@ -4,7 +4,7 @@ Tags: download, forms, ebook, pdf, shortcode
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 0.0.38
+Stable tag: 0.1.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,18 @@ Eine spätere WordPress.org-Ausgabe wird getrennt vorbereitet und enthält weder
 4. Shortcode wie `[mgd_giveaway id="123"]` in eine Seite einfügen.
 
 == Changelog ==
+
+= 0.1.1 =
+* Neue Ansicht Weitere Plugins mit Bildern, Kategorien, Suche und Installieren-Knopf.
+* Die alte Seite Weitere Plugins ist entfernt.
+
+= 0.1.0 =
+* Neuer Update-Weg über theme.michael-gahn.de, neue Seite Info und Updates.
+* Der Baukasten braucht PHP 8.1. Mit älterem PHP läuft der bisherige Update-Weg weiter.
+
+= 0.0.39 =
+* Icons und Hintergründe der Karten unter „Weitere Plugins" kommen jetzt aus theme.michael-gahn.de. Sie werden vom Server einmal geholt und lokal gespeichert, der Browser lädt nichts extern. Ohne Bild bleibt das mitgelieferte Motiv.
+* Versionen werden ohne führendes „v" angezeigt.
 
 = 0.0.38 =
 * Gemeinsame MGD-Plugin-Kollektion mit sieben Karten, lokalen Icons, Hintergrundmotiven, Suche und Details vollständig im Release-Paket enthalten.

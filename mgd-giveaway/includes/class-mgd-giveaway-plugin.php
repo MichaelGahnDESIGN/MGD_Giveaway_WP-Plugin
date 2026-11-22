@@ -7,6 +7,8 @@ if (!defined('ABSPATH')) {
 class MGD_Giveaway_Plugin
 {
     private static $instance = null;
+    // Updater vom Baukasten (setzt die Haupt-Datei) - fürs Dashboard
+    public static $kit_updater = null;
     private $post_type = 'mgd_giveaway_form';
     private $submission_table;
     private $log_table;
@@ -167,6 +169,45 @@ class MGD_Giveaway_Plugin
         add_submenu_page('mgd-giveaway', 'Logs', 'Logs', 'manage_options', 'mgd-giveaway-logs', array($this, 'render_logs_page'));
         add_submenu_page('mgd-giveaway', 'E-Mail Einstellungen', 'E-Mail', 'manage_options', 'mgd-giveaway-settings', array($this, 'render_settings_page'));
         add_submenu_page('mgd-giveaway', 'Credits', 'Credits', 'manage_options', 'mgd-giveaway-credits', array($this, 'render_credits_page'));
+        // Dashboard vom Baukasten: Info, Updates, Weitere Plugins, Installation melden
+        if (defined('MGD_GIVEAWAY_KIT') && MGD_GIVEAWAY_KIT) {
+            add_submenu_page('mgd-giveaway', 'Info und Updates', 'Info und Updates', 'manage_options', 'mgd-giveaway-info', array($this, 'render_kit_page'));
+        }
+    }
+
+    public function render_kit_page()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Nicht berechtigt.', '', array('response' => 403));
+        }
+        $setup = '\\Mgd\\Giveaway\\Kit\\Platform\\WordPress\\Setup';
+        $list = $setup::recommendations(MGD_GIVEAWAY_PRODUCT, 'wordpress', 'plugin-giveaway-wordpress', $this->kit_fallback_plugins(), 'MGD_Giveaway_WP-Plugin');
+        // parent leer = kein extra Menüpunkt, Lizenz bleibt aus
+        $dash = $setup::dashboard(MGD_GIVEAWAY_PRODUCT, 'wordpress', MGD_GIVEAWAY_VERSION, 'MGD Giveaway', self::$kit_updater, $list, false, '');
+        if (null === $dash) {
+            echo '<div class="wrap"><p>Die Seite konnte gerade nicht geladen werden.</p></div>';
+            return;
+        }
+        $dash->page();
+    }
+
+    /** Ersatzliste aus plugin-catalog/plugins.json, falls theme.michael-gahn.de nicht antwortet */
+    private function kit_fallback_plugins()
+    {
+        $raw = file_get_contents(MGD_GIVEAWAY_DIR . 'includes/plugin-catalog/plugins.json');
+        $data = is_string($raw) ? json_decode($raw, true) : null;
+        $out = array();
+        foreach (is_array($data) ? $data : array() as $row) {
+            if (is_array($row) && !empty($row['slug'])) {
+                $out[] = array(
+                    'slug' => (string) $row['slug'],
+                    'name' => (string) ($row['name'] ?? ''),
+                    'description' => (string) ($row['description'] ?? ''),
+                    'version' => '',
+                );
+            }
+        }
+        return $out;
     }
 
     public function enqueue_admin_assets($hook)

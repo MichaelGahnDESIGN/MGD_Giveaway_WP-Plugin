@@ -1,5 +1,9 @@
 # Versionen
 
+## 2026-10-27 – Version 0.0.39
+
+Icons und Hintergründe der Karten unter „Weitere Plugins" kommen jetzt aus theme.michael-gahn.de. Der Server holt sie einmal und speichert sie lokal, der Browser lädt nichts extern. Ohne Bild bleibt das mitgelieferte Motiv. Versionen werden ohne führendes „v" angezeigt. Rückfall: Release-ZIP 0.0.38.
+
 ## 2026-10-26 – Version 0.0.38 (für Veröffentlichung vorbereitet)
 
 Die gemeinsame MGD-Plugin-Kollektion wird vollständig mit Icons, sieben Hintergrundmotiven und lokaler Oberfläche paketiert. Giveaway bietet die Ansicht damit auch ohne zusätzliches MGD-Plugin. Paketmanifest und gezielte CI-Prüfungen sichern die Vollständigkeit ab. Formular-/Kontaktdaten, E-Mail-Versand und Datenbankstruktur ändern sich nicht. Lokale Prüfungen und noch offene Release-/Browsernachweise stehen im [Playbook](../docs/playbooks/2026-10-26-katalog-release.md). Rückfall: vorheriges Release-ZIP 0.0.37 und bei einer echten Website das vorher angelegte vollständige Backup.
