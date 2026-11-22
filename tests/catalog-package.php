@@ -20,12 +20,16 @@ foreach ($metadata as $repo => $item) {
     mgd_catalog_assert($size && $size[0] === 1080 && $size[1] === 360 && $size['mime'] === 'image/webp', 'Lokales Kartenmotiv ' . $repo);
     mgd_catalog_assert(filesize($picture) < 80000, 'Kompaktes Kartenmotiv ' . $repo);
 }
-foreach (array('class-provider.php', 'view.php', 'plugins.json') as $name) {
+foreach (array('plugins.json') as $name) {
     mgd_catalog_assert(is_file($runtime . '/includes/plugin-catalog/' . $name), 'Katalogbestandteil ' . $name);
 }
 $bootstrap = $main;
 foreach (glob($runtime . '/includes/*.php') as $file) { $bootstrap .= file_get_contents($file); }
-mgd_catalog_assert((bool) preg_match('/new\s+\\\\?MGD_WordPress_Plugin_Catalog_V4\s*\(/', $bootstrap), 'Versionsfester Einstiegspunkt');
+// ab 0.1.1: alte Katalogseite V4 ganz raus, Weitere Plugins kommt nur noch vom Baukasten
+mgd_catalog_assert(false === strpos($bootstrap, 'MGD_WordPress_Plugin_Catalog_V4'), 'Alte Katalogseite entfernt');
+mgd_catalog_assert(!is_file($runtime . '/includes/class-mgd-wordpress-plugin-catalog.php') && !is_file($runtime . '/includes/plugin-catalog/view.php'), 'Alte Katalogdatei weg');
+mgd_catalog_assert(is_file($runtime . '/includes/Kit/Platform/WordPress/CatalogInstaller.php'), 'Baukasten mit Installieren-Knopf');
+mgd_catalog_assert(false === strpos($bootstrap, 'catalogActions'), 'Kein eigener catalogActions-Aufruf');
 // ab 0.1.0: Baukasten ab PHP 8.1, alter Weg nur noch als Rückfall für älteres PHP
 mgd_catalog_assert(false !== strpos($main, "Setup::updater(__FILE__, MGD_GIVEAWAY_PRODUCT"), 'Baukasten-Updater angemeldet');
 mgd_catalog_assert(false !== strpos($main, "define('MGD_GIVEAWAY_PRODUCT', 'mgd-giveaway-wordpress')"), 'Produktname mgd-giveaway-wordpress');
