@@ -3,7 +3,7 @@
  * Plugin Name: MGD Giveaway
  * Plugin URI: https://github.com/MichaelGahnDESIGN/MGD_Giveaway_WP-Plugin
  * Description: Erstellt Download-Formulare für Gratis-eBooks und PDFs mit Shortcode, Backend-Verwaltung und Credits.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: Michael Gahn DESIGN
  * Author URI: https://Michael-Gahn.de
  * License: GPL-2.0-or-later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('MGD_GIVEAWAY_VERSION', '0.1.0');
+define('MGD_GIVEAWAY_VERSION', '0.1.1');
 define('MGD_GIVEAWAY_FILE', __FILE__);
 define('MGD_GIVEAWAY_DIR', plugin_dir_path(__FILE__));
 define('MGD_GIVEAWAY_URL', plugin_dir_url(__FILE__));
@@ -48,13 +48,9 @@ if (MGD_GIVEAWAY_KIT) {
     // Reste vom alten Updater wegräumen, 1x pro Version
     \Mgd\Giveaway\Kit\Platform\WordPress\Setup::cleanupLegacy(MGD_GIVEAWAY_PRODUCT, MGD_GIVEAWAY_VERSION, array('mgd_giveaway_github_release', 'mgd_admin_release_*'));
 } else {
-    // altes PHP: bisheriger Weg bleibt wie in 0.0.39
+    // altes PHP: nur noch alter Updater + Admin-Tools, alte Seite Weitere Plugins ist raus (ab 0.1.1)
     require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-giveaway-updater.php';
-    require_once MGD_GIVEAWAY_DIR . 'includes/class-mgd-wordpress-plugin-catalog.php';
     MGD_Giveaway_Updater::register();
-    add_action('plugins_loaded', function () {
-        (new MGD_WordPress_Plugin_Catalog_V4())->register('mgd-giveaway');
-    });
     require_once __DIR__ . '/includes/class-mgd-plugin-admin-tools.php';
     \MGD_Plugin_Admin_Tools_20261023::register([
         'file' => __FILE__,

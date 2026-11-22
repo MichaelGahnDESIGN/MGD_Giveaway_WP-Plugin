@@ -1,5 +1,11 @@
 # Änderungen
 
+## 0.1.1 – 2026-11-22
+
+- Neue Ansicht „Weitere Plugins“ vom Baukasten: Bilder, Kategorien, Suche, Filter, Details und Installieren-Knopf.
+- Die alte Seite „Weitere Plugins“ (MGD Plugin-Kollektion) ist ganz entfernt. Mit PHP unter 8.1 gibt es diese Seite nicht mehr, Updates laufen dort weiter über den alten Weg.
+- Keine Änderung an Formularen, Kontakten, Mailversand oder Datenbank.
+
 ## 0.1.0 – 2026-11-21
 
 - Neuer Update-Weg über theme.michael-gahn.de, neue Seite Info und Updates (Plugin-Baukasten).

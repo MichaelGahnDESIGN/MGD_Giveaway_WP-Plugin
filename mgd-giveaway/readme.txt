@@ -4,7 +4,7 @@ Tags: download, forms, ebook, pdf, shortcode
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,10 @@ Eine spätere WordPress.org-Ausgabe wird getrennt vorbereitet und enthält weder
 4. Shortcode wie `[mgd_giveaway id="123"]` in eine Seite einfügen.
 
 == Changelog ==
+
+= 0.1.1 =
+* Neue Ansicht Weitere Plugins mit Bildern, Kategorien, Suche und Installieren-Knopf.
+* Die alte Seite Weitere Plugins ist entfernt.
 
 = 0.1.0 =
 * Neuer Update-Weg über theme.michael-gahn.de, neue Seite Info und Updates.
