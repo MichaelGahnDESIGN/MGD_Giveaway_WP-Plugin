@@ -1,5 +1,14 @@
 # Änderungen
 
+## Unveröffentlicht (kommt mit 2.1.1)
+
+- Giveaway hängt jetzt unter dem Menü „MGD Tools“. Das eigene Hauptmenü ist weg, die sechs Untermenüs sind Reiter auf einer Seite (Dashboard, Neues Formular, Mail-Liste, Logs, E-Mail, Credits). Alte Links und Lesezeichen leiten von selbst um.
+- Baukasten 1.12.1: Übersicht und Updates, Weitere Plugins und Installation melden stehen zentral unter MGD Tools.
+- Neuer Farbwähler für alle Farbfelder (wie in den anderen MGD-Plugins).
+- Plugin-Kopf nach Norm, Icons 128 und 256.
+- Der alte Admin-Tools-Baustein und der alte GitHub-Updater sind entfernt.
+- Giveaway braucht jetzt PHP 8.1 (der Baukasten braucht es). Mit älterem PHP bietet WordPress das Update nicht mehr an.
+
 ## 0.1.1 – 2026-11-22
 
 - Neue Ansicht „Weitere Plugins“ vom Baukasten: Bilder, Kategorien, Suche, Filter, Details und Installieren-Knopf.

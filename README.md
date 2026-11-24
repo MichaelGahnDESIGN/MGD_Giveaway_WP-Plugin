@@ -49,6 +49,10 @@ Anforderungen laut Plugin-Header (`mgd-giveaway/mgd-giveaway.php`) und `readme.t
 | PHP | ab Version 7.4 |
 | Lizenz | GPL-2.0-or-later |
 
+## Wo finde ich was? (ab 0.1.1)
+
+Giveaway hat kein eigenes Hauptmenü mehr. Alles steht unter **MGD Tools › Giveaway**. Oben auf der Seite sind Reiter: Dashboard, Neues Formular, Mail-Liste, Logs, E-Mail und Credits. Updates und „Weitere Plugins“ findest du direkt unter **MGD Tools**.
+
 ## Erste Schritte
 
 Ab Version `0.0.35` zeigt WordPress neue, reguläre GitHub-Releases unter **Plugins → Aktualisierungen** an. Die Installation erfolgt durch WordPress nach Freigabe durch eine berechtigte Person; das Plugin überschreibt sich nicht selbst. Für bereits installierte Versionen bis `0.0.34` ist **einmalig** ein Update per ZIP nötig, weil deren Code noch keine GitHub-Updatequelle kennt. Vorher Website und Datenbank sichern. Der Release-Kanal ist öffentlich; eine private Installation oder geheime GitHub-Zugangsdaten werden nicht unterstützt.
@@ -77,6 +81,13 @@ Nach erfolgreicher Anmeldung zeigt das Plugin den Download-Button direkt anstell
 
 > [!NOTE]
 > **👤 FÜR ENTWICKLER** — Für den SMTP-Versand empfiehlt der Sicherheitsbericht (`Dokumentation/security_best_practices_report.md`) dedizierte SMTP-Zugangsdaten mit minimalen Rechten statt Hauptkonto-Passwörtern. Das SMTP-Passwort wird in den WordPress-Optionen (Datenbank) gespeichert.
+
+## Datenschutz
+
+- Das Plugin selbst setzt keine Tracker und lädt keine fremden Skripte im Frontend.
+- Formulardaten und E-Mail-Adressen bleiben in deiner eigenen WordPress-Datenbank.
+- Die Update-Prüfung und „Installation melden“ laufen über theme.michael-gahn.de. Was dabei gesendet wird und wie du es abschaltest, steht unter MGD Tools.
+- Details zu maskierten Downloads und DSGVO-Werkzeugen: Wiki-Seite „Datenschutz-und-Sicherheit“.
 
 ## Grenzen
 

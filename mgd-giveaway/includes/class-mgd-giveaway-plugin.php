@@ -7,8 +7,6 @@ if (!defined('ABSPATH')) {
 class MGD_Giveaway_Plugin
 {
     private static $instance = null;
-    // Updater vom Baukasten (setzt die Haupt-Datei) - fürs Dashboard
-    public static $kit_updater = null;
     private $post_type = 'mgd_giveaway_form';
     private $submission_table;
     private $log_table;
@@ -37,7 +35,8 @@ class MGD_Giveaway_Plugin
 
         add_action('init', array($this, 'register_post_type'));
         add_action('init', array($this, 'maybe_upgrade'));
-        add_action('admin_menu', array($this, 'register_admin_menu'));
+        // Weiterleitung muss vor der Rechteprüfung der Seite laufen > admin_menu
+        add_action('admin_menu', array($this, 'redirect_legacy_pages'), 99);
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_action('template_redirect', array($this, 'handle_masked_download'));
@@ -151,63 +150,56 @@ class MGD_Giveaway_Plugin
         ));
     }
 
-    public function register_admin_menu()
-    {
-        add_menu_page(
-            'MGD Giveaway',
-            'MGD Giveaway',
-            'manage_options',
-            'mgd-giveaway',
-            array($this, 'render_dashboard_page'),
-            'dashicons-download',
-            56
-        );
+    // Ansichten der einen Seite unter MGD Tools (vorher eigene Untermenüs)
+    const VIEWS = array(
+        'dashboard' => array('Dashboard', 'render_dashboard_page'),
+        'form' => array('Neues Formular', 'render_form_editor_page'),
+        'mail-list' => array('Mail-Liste', 'render_mail_list_page'),
+        'logs' => array('Logs', 'render_logs_page'),
+        'settings' => array('E-Mail', 'render_settings_page'),
+        'credits' => array('Credits', 'render_credits_page'),
+    );
 
-        add_submenu_page('mgd-giveaway', 'Dashboard', 'Dashboard', 'manage_options', 'mgd-giveaway', array($this, 'render_dashboard_page'));
-        add_submenu_page('mgd-giveaway', 'Neues Formular', 'Neues Formular', 'manage_options', 'mgd-giveaway-form', array($this, 'render_form_editor_page'));
-        add_submenu_page('mgd-giveaway', 'Mail-Liste', 'Mail-Liste', 'manage_options', 'mgd-giveaway-mail-list', array($this, 'render_mail_list_page'));
-        add_submenu_page('mgd-giveaway', 'Logs', 'Logs', 'manage_options', 'mgd-giveaway-logs', array($this, 'render_logs_page'));
-        add_submenu_page('mgd-giveaway', 'E-Mail Einstellungen', 'E-Mail', 'manage_options', 'mgd-giveaway-settings', array($this, 'render_settings_page'));
-        add_submenu_page('mgd-giveaway', 'Credits', 'Credits', 'manage_options', 'mgd-giveaway-credits', array($this, 'render_credits_page'));
-        // Dashboard vom Baukasten: Info, Updates, Weitere Plugins, Installation melden
-        if (defined('MGD_GIVEAWAY_KIT') && MGD_GIVEAWAY_KIT) {
-            add_submenu_page('mgd-giveaway', 'Info und Updates', 'Info und Updates', 'manage_options', 'mgd-giveaway-info', array($this, 'render_kit_page'));
-        }
-    }
-
-    public function render_kit_page()
+    // alte Seiten-Kennungen > neue Ansicht (Lesezeichen, alte Links)
+    public function redirect_legacy_pages()
     {
-        if (!current_user_can('manage_options')) {
-            wp_die('Nicht berechtigt.', '', array('response' => 403));
-        }
-        $setup = '\\Mgd\\Giveaway\\Kit\\Platform\\WordPress\\Setup';
-        $list = $setup::recommendations(MGD_GIVEAWAY_PRODUCT, 'wordpress', 'plugin-giveaway-wordpress', $this->kit_fallback_plugins(), 'MGD_Giveaway_WP-Plugin');
-        // parent leer = kein extra Menüpunkt, Lizenz bleibt aus
-        $dash = $setup::dashboard(MGD_GIVEAWAY_PRODUCT, 'wordpress', MGD_GIVEAWAY_VERSION, 'MGD Giveaway', self::$kit_updater, $list, false, '');
-        if (null === $dash) {
-            echo '<div class="wrap"><p>Die Seite konnte gerade nicht geladen werden.</p></div>';
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        if (0 !== strpos($page, 'mgd-giveaway-') || !current_user_can('manage_options')) {
             return;
         }
-        $dash->page();
+        $view = substr($page, strlen('mgd-giveaway-'));
+        if ('info' === $view || 'plugins' === $view) {
+            wp_safe_redirect(\Mgd\Giveaway\Kit\Platform\WordPress\Tools::url());
+            exit;
+        }
+        if (!isset(self::VIEWS[$view])) {
+            return;
+        }
+        $args = $_GET;
+        $args['page'] = 'mgd-giveaway';
+        $args['mgd_view'] = $view;
+        wp_safe_redirect(add_query_arg(array_map('rawurlencode', array_map('strval', array_filter($args, 'is_scalar'))), admin_url('admin.php')));
+        exit;
     }
 
-    /** Ersatzliste aus plugin-catalog/plugins.json, falls theme.michael-gahn.de nicht antwortet */
-    private function kit_fallback_plugins()
+    public function render_tools_page()
     {
-        $raw = file_get_contents(MGD_GIVEAWAY_DIR . 'includes/plugin-catalog/plugins.json');
-        $data = is_string($raw) ? json_decode($raw, true) : null;
-        $out = array();
-        foreach (is_array($data) ? $data : array() as $row) {
-            if (is_array($row) && !empty($row['slug'])) {
-                $out[] = array(
-                    'slug' => (string) $row['slug'],
-                    'name' => (string) ($row['name'] ?? ''),
-                    'description' => (string) ($row['description'] ?? ''),
-                    'version' => '',
-                );
-            }
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Keine Berechtigung.', 'mgd-giveaway'));
         }
-        return $out;
+        $view = isset($_GET['mgd_view']) ? sanitize_key(wp_unslash($_GET['mgd_view'])) : 'dashboard';
+        if (!isset(self::VIEWS[$view])) {
+            $view = 'dashboard';
+        }
+        // Reiter oben
+        echo '<nav class="nav-tab-wrapper" style="margin:14px 0 0;">';
+        foreach (self::VIEWS as $key => $def) {
+            $url = admin_url('admin.php?page=mgd-giveaway' . ('dashboard' === $key ? '' : '&mgd_view=' . $key));
+            echo '<a class="nav-tab' . ($key === $view ? ' nav-tab-active' : '') . '" href="' . esc_url($url) . '">' . esc_html($def[0]) . '</a>';
+        }
+        echo '</nav>';
+        $method = self::VIEWS[$view][1];
+        $this->$method();
     }
 
     public function enqueue_admin_assets($hook)
@@ -317,7 +309,7 @@ class MGD_Giveaway_Plugin
         echo '<div><strong>' . esc_html(count($forms)) . '</strong><span>Formulare</span></div>';
         echo '<div><strong>' . esc_html($this->count_submissions()) . '</strong><span>Anmeldungen</span></div>';
         echo '</div>';
-        echo '<p><a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=mgd-giveaway-form')) . '">Neues Formular erstellen</a></p>';
+        echo '<p><a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=mgd-giveaway&mgd_view=form')) . '">Neues Formular erstellen</a></p>';
         echo '<table class="widefat striped"><thead><tr><th>Name</th><th>Shortcode</th><th>Anmeldungen</th><th>Aktionen</th></tr></thead><tbody>';
 
         if (!$forms) {
@@ -325,7 +317,7 @@ class MGD_Giveaway_Plugin
         }
 
         foreach ($forms as $form) {
-            $edit_url = admin_url('admin.php?page=mgd-giveaway-form&form_id=' . (int) $form->ID);
+            $edit_url = admin_url('admin.php?page=mgd-giveaway&mgd_view=form&form_id=' . (int) $form->ID);
             $duplicate_url = wp_nonce_url(admin_url('admin-post.php?action=mgd_giveaway_duplicate_form&form_id=' . (int) $form->ID), 'mgd_giveaway_duplicate_' . (int) $form->ID);
             $delete_url = wp_nonce_url(admin_url('admin-post.php?action=mgd_giveaway_delete_form&form_id=' . (int) $form->ID), 'mgd_giveaway_delete_' . (int) $form->ID);
             echo '<tr>';
@@ -417,12 +409,12 @@ class MGD_Giveaway_Plugin
         echo '<label class="mgd-field"><span>E-Mail Text</span><textarea name="email_body" rows="8">' . esc_textarea($config['email_body']) . '</textarea><small>Platzhalter: {download_url}</small></label>';
         echo '<hr><h3>E-Mail Design</h3><p class="description">Design für Bestätigungs- und Download-E-Mails.</p>';
         echo '<label class="mgd-field"><span>Markenname im E-Mail-Kopf</span><input type="text" name="email_style[brand_label]" value="' . esc_attr($config['email_style']['brand_label']) . '"></label>';
-        echo '<label class="mgd-field"><span>Hintergrundfarbe</span><input type="color" name="email_style[background]" value="' . esc_attr($config['email_style']['background']) . '"></label>';
-        echo '<label class="mgd-field"><span>Kartenfarbe</span><input type="color" name="email_style[card_background]" value="' . esc_attr($config['email_style']['card_background']) . '"></label>';
-        echo '<label class="mgd-field"><span>Textfarbe</span><input type="color" name="email_style[text_color]" value="' . esc_attr($config['email_style']['text_color']) . '"></label>';
-        echo '<label class="mgd-field"><span>Hinweistextfarbe</span><input type="color" name="email_style[muted_color]" value="' . esc_attr($config['email_style']['muted_color']) . '"></label>';
-        echo '<label class="mgd-field"><span>Akzent- und Buttonfarbe</span><input type="color" name="email_style[accent_color]" value="' . esc_attr($config['email_style']['accent_color']) . '"></label>';
-        echo '<label class="mgd-field"><span>Button Textfarbe</span><input type="color" name="email_style[button_text_color]" value="' . esc_attr($config['email_style']['button_text_color']) . '"></label>';
+        echo '<label class="mgd-field"><span>Hintergrundfarbe</span><input type="text" name="email_style[background]" value="' . esc_attr($config['email_style']['background']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Kartenfarbe</span><input type="text" name="email_style[card_background]" value="' . esc_attr($config['email_style']['card_background']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Textfarbe</span><input type="text" name="email_style[text_color]" value="' . esc_attr($config['email_style']['text_color']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Hinweistextfarbe</span><input type="text" name="email_style[muted_color]" value="' . esc_attr($config['email_style']['muted_color']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Akzent- und Buttonfarbe</span><input type="text" name="email_style[accent_color]" value="' . esc_attr($config['email_style']['accent_color']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Button Textfarbe</span><input type="text" name="email_style[button_text_color]" value="' . esc_attr($config['email_style']['button_text_color']) . '" data-mgd-color></label>';
         echo '<label class="mgd-field"><span>Bestätigungsbutton Text</span><input type="text" name="email_style[confirm_button_label]" value="' . esc_attr($config['email_style']['confirm_button_label']) . '"></label>';
         echo '<label class="mgd-field"><span>Downloadbutton Text</span><input type="text" name="email_style[download_button_label]" value="' . esc_attr($config['email_style']['download_button_label']) . '"></label>';
         echo '<label class="mgd-field"><span>Footer / Impressumsangaben</span><textarea name="email_style[footer_text]" rows="7">' . esc_textarea($config['email_style']['footer_text']) . '</textarea></label>';
@@ -433,9 +425,9 @@ class MGD_Giveaway_Plugin
 
         echo '<div class="mgd-tab-panel ' . esc_attr('design' === $active_tab ? 'is-active' : '') . '" data-panel="design"><section class="mgd-panel mgd-editor-card"><h2>Design</h2><p class="description">Einfache Formularoptik für die Ausgabe per Shortcode.</p>';
         echo '<label class="mgd-field"><span>Maximale Breite in Pixel</span><input type="number" min="260" max="1200" name="style[max_width]" value="' . esc_attr((string) $config['style']['max_width']) . '"></label>';
-        echo '<label class="mgd-field"><span>Button Hintergrund</span><input type="color" name="style[button_bg]" value="' . esc_attr($config['style']['button_bg']) . '"></label>';
-        echo '<label class="mgd-field"><span>Button Textfarbe</span><input type="color" name="style[button_text]" value="' . esc_attr($config['style']['button_text']) . '"></label>';
-        echo '<label class="mgd-field"><span>Feld-Rahmenfarbe</span><input type="color" name="style[field_border]" value="' . esc_attr($config['style']['field_border']) . '"></label>';
+        echo '<label class="mgd-field"><span>Button Hintergrund</span><input type="text" name="style[button_bg]" value="' . esc_attr($config['style']['button_bg']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Button Textfarbe</span><input type="text" name="style[button_text]" value="' . esc_attr($config['style']['button_text']) . '" data-mgd-color></label>';
+        echo '<label class="mgd-field"><span>Feld-Rahmenfarbe</span><input type="text" name="style[field_border]" value="' . esc_attr($config['style']['field_border']) . '" data-mgd-color></label>';
         echo '<label class="mgd-field"><span>Eckenradius in Pixel</span><input type="number" min="0" max="32" name="style[radius]" value="' . esc_attr((string) $config['style']['radius']) . '"></label>';
         echo '</section></div>';
 
@@ -611,7 +603,7 @@ class MGD_Giveaway_Plugin
 
         echo '<div class="wrap mgd-admin"><h1>Mail-Liste</h1>';
         $this->render_notices();
-        echo '<form method="get" class="mgd-toolbar"><input type="hidden" name="page" value="mgd-giveaway-mail-list"><input type="search" name="s" value="' . esc_attr($search) . '" placeholder="E-Mail oder Daten suchen"><button class="button">Suchen</button> <a class="button" href="' . esc_url(admin_url('admin.php?page=mgd-giveaway-mail-list')) . '">Zurücksetzen</a></form>';
+        echo '<form method="get" class="mgd-toolbar"><input type="hidden" name="page" value="mgd-giveaway"><input type="hidden" name="mgd_view" value="mail-list"><input type="search" name="s" value="' . esc_attr($search) . '" placeholder="E-Mail oder Daten suchen"><button class="button">Suchen</button> <a class="button" href="' . esc_url(admin_url('admin.php?page=mgd-giveaway&mgd_view=mail-list')) . '">Zurücksetzen</a></form>';
         echo '<div class="mgd-toolbar">';
         echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=mgd_giveaway_export_mail_list'), 'mgd_giveaway_export_mail_list')) . '">CSV exportieren</a>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" enctype="multipart/form-data">';
@@ -702,7 +694,7 @@ class MGD_Giveaway_Plugin
         echo '<div class="wrap mgd-admin"><h1>Logs</h1>';
         $this->render_notices();
         echo '<div class="mgd-stats"><div><strong>' . esc_html((string) $this->count_logs()) . '</strong><span>Log-Einträge</span></div><div><strong>' . esc_html($storage) . '</strong><span>Speicherverbrauch</span></div></div>';
-        echo '<form method="get" class="mgd-toolbar"><input type="hidden" name="page" value="mgd-giveaway-logs"><input type="search" name="s" value="' . esc_attr($search) . '" placeholder="Logs durchsuchen"><select name="level"><option value="">Alle Level</option><option value="info" ' . selected($level, 'info', false) . '>Info</option><option value="warning" ' . selected($level, 'warning', false) . '>Warnung</option><option value="error" ' . selected($level, 'error', false) . '>Fehler</option></select><button class="button">Filtern</button> <a class="button" href="' . esc_url(admin_url('admin.php?page=mgd-giveaway-logs')) . '">Zurücksetzen</a></form>';
+        echo '<form method="get" class="mgd-toolbar"><input type="hidden" name="page" value="mgd-giveaway"><input type="hidden" name="mgd_view" value="logs"><input type="search" name="s" value="' . esc_attr($search) . '" placeholder="Logs durchsuchen"><select name="level"><option value="">Alle Level</option><option value="info" ' . selected($level, 'info', false) . '>Info</option><option value="warning" ' . selected($level, 'warning', false) . '>Warnung</option><option value="error" ' . selected($level, 'error', false) . '>Fehler</option></select><button class="button">Filtern</button> <a class="button" href="' . esc_url(admin_url('admin.php?page=mgd-giveaway&mgd_view=logs')) . '">Zurücksetzen</a></form>';
         echo '<div class="mgd-toolbar"><a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=mgd_giveaway_export_logs'), 'mgd_giveaway_export_logs')) . '">Logs exportieren</a>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Logs wirklich leeren?\');">';
         wp_nonce_field('mgd_giveaway_clear_logs');
@@ -816,7 +808,7 @@ class MGD_Giveaway_Plugin
         $this->add_log('info', 'form_saved', 'Formular gespeichert.', array('form_id' => $form_id, 'title' => $post_data['post_title']));
 
         $active_tab = isset($_POST['mgd_active_tab']) ? sanitize_key(wp_unslash($_POST['mgd_active_tab'])) : 'fields';
-        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-form&form_id=' . (int) $form_id . '&mgd_notice=saved&mgd_tab=' . rawurlencode($active_tab)));
+        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=form&form_id=' . (int) $form_id . '&mgd_notice=saved&mgd_tab=' . rawurlencode($active_tab)));
         exit;
     }
 
@@ -1009,7 +1001,7 @@ class MGD_Giveaway_Plugin
         update_post_meta($new_id, '_mgd_giveaway_config', $this->get_form_config($form_id));
         $this->add_log('info', 'form_duplicated', 'Formular dupliziert.', array('source_form_id' => $form_id, 'new_form_id' => $new_id));
 
-        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-form&form_id=' . (int) $new_id . '&mgd_notice=duplicated'));
+        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=form&form_id=' . (int) $new_id . '&mgd_notice=duplicated'));
         exit;
     }
 
@@ -1035,7 +1027,7 @@ class MGD_Giveaway_Plugin
 
         update_option('mgd_giveaway_settings', $settings, false);
         $this->add_log('info', 'settings_saved', 'E-Mail Einstellungen gespeichert.', array('notification_recipient' => $settings['notification_recipient'], 'mail_method' => $settings['mail_method']));
-        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-settings&mgd_notice=saved'));
+        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=settings&mgd_notice=saved'));
         exit;
     }
 
@@ -1059,7 +1051,7 @@ class MGD_Giveaway_Plugin
         }
 
         if (empty($_FILES['mail_list_csv']['tmp_name'])) {
-            wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-mail-list&mgd_notice=import_empty'));
+            wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=mail-list&mgd_notice=import_empty'));
             exit;
         }
 
@@ -1071,7 +1063,7 @@ class MGD_Giveaway_Plugin
 
         if ('csv' !== $extension || !is_uploaded_file($tmp_name) || $file_size > $this->max_csv_upload_bytes) {
             $this->add_log('warning', 'mail_list_import_rejected', 'CSV Import abgelehnt.', array('filename' => $filename, 'size' => $file_size));
-            wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-mail-list&mgd_notice=import_invalid'));
+            wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=mail-list&mgd_notice=import_invalid'));
             exit;
         }
 
@@ -1097,7 +1089,7 @@ class MGD_Giveaway_Plugin
         }
 
         $this->add_log('info', 'mail_list_import', 'Mail-Liste als CSV importiert.', array('filename' => $filename, 'count' => $imported));
-        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-mail-list&mgd_notice=imported'));
+        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=mail-list&mgd_notice=imported'));
         exit;
     }
 
@@ -1133,7 +1125,7 @@ class MGD_Giveaway_Plugin
         $item = $wpdb->get_row($wpdb->prepare("SELECT email FROM {$this->submission_table} WHERE id = %d", $submission_id), ARRAY_A);
         $wpdb->delete($this->submission_table, array('id' => $submission_id), array('%d'));
         $this->add_log('info', 'contact_deleted', 'Kontakt-Daten gelöscht.', array('submission_id' => $submission_id, 'email' => isset($item['email']) ? $item['email'] : ''));
-        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-mail-list&mgd_notice=contact_deleted'));
+        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=mail-list&mgd_notice=contact_deleted'));
         exit;
     }
 
@@ -1156,7 +1148,7 @@ class MGD_Giveaway_Plugin
 
         global $wpdb;
         $wpdb->query("TRUNCATE TABLE {$this->log_table}");
-        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway-logs&mgd_notice=logs_cleared'));
+        wp_safe_redirect(admin_url('admin.php?page=mgd-giveaway&mgd_view=logs&mgd_notice=logs_cleared'));
         exit;
     }
 

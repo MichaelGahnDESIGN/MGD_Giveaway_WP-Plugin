@@ -30,11 +30,14 @@ mgd_catalog_assert(false === strpos($bootstrap, 'MGD_WordPress_Plugin_Catalog_V4
 mgd_catalog_assert(!is_file($runtime . '/includes/class-mgd-wordpress-plugin-catalog.php') && !is_file($runtime . '/includes/plugin-catalog/view.php'), 'Alte Katalogdatei weg');
 mgd_catalog_assert(is_file($runtime . '/includes/Kit/Platform/WordPress/CatalogInstaller.php'), 'Baukasten mit Installieren-Knopf');
 mgd_catalog_assert(false === strpos($bootstrap, 'catalogActions'), 'Kein eigener catalogActions-Aufruf');
-// ab 0.1.0: Baukasten ab PHP 8.1, alter Weg nur noch als Rückfall für älteres PHP
-mgd_catalog_assert(false !== strpos($main, "Setup::updater(__FILE__, MGD_GIVEAWAY_PRODUCT"), 'Baukasten-Updater angemeldet');
-mgd_catalog_assert(false !== strpos($main, "define('MGD_GIVEAWAY_PRODUCT', 'mgd-giveaway-wordpress')"), 'Produktname mgd-giveaway-wordpress');
-mgd_catalog_assert((bool) preg_match('/if \(MGD_GIVEAWAY_KIT\) \{.*\} else \{.*MGD_Giveaway_Updater::register\(\);.*MGD_Plugin_Admin_Tools_20261023::register/s', $main), 'Alter Updater nur ohne Baukasten');
-mgd_catalog_assert(substr_count($main, 'MGD_Giveaway_Updater::register()') === 1, 'Alter Updater nur einmal');
+// ab 0.1.1: MGD Tools vom Baukasten, kein eigenes Menü, alter Updater und Admin-Tools raus
+mgd_catalog_assert(false !== strpos($main, "Setup::updater(__FILE__, 'mgd-giveaway-wordpress'"), 'Baukasten-Updater angemeldet');
+mgd_catalog_assert(false !== strpos($main, 'Setup::tools(__FILE__'), 'MGD Tools vom Baukasten');
+mgd_catalog_assert(!preg_match('/\badd_(menu|submenu|options|management|media)_page\s*\(/', $bootstrap), 'Kein eigenes Menü');
+mgd_catalog_assert(!is_file($runtime . '/includes/class-mgd-plugin-admin-tools.php') && !is_file($runtime . '/includes/class-mgd-giveaway-updater.php'), 'Alter Updater und Admin-Tools weg');
+mgd_catalog_assert(false === strpos($bootstrap, 'MGD_Giveaway_Updater') && false === strpos($bootstrap, 'MGD_GIVEAWAY_KIT'), 'Keine Reste vom alten Weg');
+mgd_catalog_assert(false === strpos($bootstrap, 'type="color"') && false !== strpos($bootstrap, 'data-mgd-color'), 'Farbfelder mit data-mgd-color');
+mgd_catalog_assert(is_file($runtime . '/assets/icon-128x128.png') && is_file($runtime . '/assets/icon-256x256.png'), 'Icons 128 und 256');
 mgd_catalog_assert(false !== strpos(file_get_contents($runtime . '/uninstall.php'), "Setup::uninstall('mgd-giveaway-wordpress', 'wordpress')"), 'Abmeldung in uninstall.php');
 mgd_catalog_assert(is_file($runtime . '/includes/Kit/Platform/WordPress/Updater.php'), 'Baukasten vorhanden');
 echo "PASS Pluginversion, sieben Katalogeinträge, lokale Icons und vollständige Laufzeitdateien\n";
