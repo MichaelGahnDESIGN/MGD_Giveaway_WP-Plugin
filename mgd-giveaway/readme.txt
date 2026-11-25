@@ -4,7 +4,7 @@ Tags: download, forms, ebook, pdf, shortcode
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 0.1.1
+Stable tag: 2.1.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,11 @@ Eine spätere WordPress.org-Ausgabe wird getrennt vorbereitet und enthält weder
 4. Shortcode wie `[mgd_giveaway id="123"]` in eine Seite einfügen.
 
 == Changelog ==
+
+= 2.1.1 =
+* Gemeinsame Verwaltung unter MGD Tools, einheitliche Darstellung, Icons.
+* Giveaway hat kein eigenes Hauptmenü mehr, die Ansichten sind Reiter auf einer Seite.
+* Neuer Farbwähler. Giveaway braucht jetzt PHP 8.1.
 
 = 0.1.1 =
 * Neue Ansicht Weitere Plugins mit Bildern, Kategorien, Suche und Installieren-Knopf.

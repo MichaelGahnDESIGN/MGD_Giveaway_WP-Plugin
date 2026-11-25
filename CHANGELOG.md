@@ -1,7 +1,8 @@
 # Änderungen
 
-## Unveröffentlicht (kommt mit 2.1.1)
+## [2.1.1] - 2026-11-25
 
+- Gemeinsame Verwaltung unter MGD Tools, einheitliche Darstellung, Icons.
 - Giveaway hängt jetzt unter dem Menü „MGD Tools“. Das eigene Hauptmenü ist weg, die sechs Untermenüs sind Reiter auf einer Seite (Dashboard, Neues Formular, Mail-Liste, Logs, E-Mail, Credits). Alte Links und Lesezeichen leiten von selbst um.
 - Baukasten 1.12.1: Übersicht und Updates, Weitere Plugins und Installation melden stehen zentral unter MGD Tools.
 - Neuer Farbwähler für alle Farbfelder (wie in den anderen MGD-Plugins).
