@@ -53,6 +53,8 @@ Anforderungen laut Plugin-Header (`mgd-giveaway/mgd-giveaway.php`) und `readme.t
 
 Giveaway hat kein eigenes Hauptmenü mehr. Alles steht unter **MGD Tools › Giveaway**. Oben auf der Seite sind Reiter: Dashboard, Neues Formular, Mail-Liste, Logs, E-Mail und Credits. Updates und „Weitere Plugins“ findest du direkt unter **MGD Tools**.
 
+Neu in 2.1.3: Unter **MGD Tools** kannst du jedes MGD-Plugin mit einem Klick **aktivieren oder deaktivieren**. Bei jedem Plugin steht, ob eine **Lizenz** aktiv ist (z. B. „Gratis“ oder „Pro“).
+
 ## Erste Schritte
 
 Ab Version `0.0.35` zeigt WordPress neue, reguläre GitHub-Releases unter **Plugins → Aktualisierungen** an. Die Installation erfolgt durch WordPress nach Freigabe durch eine berechtigte Person; das Plugin überschreibt sich nicht selbst. Für bereits installierte Versionen bis `0.0.34` ist **einmalig** ein Update per ZIP nötig, weil deren Code noch keine GitHub-Updatequelle kennt. Vorher Website und Datenbank sichern. Der Release-Kanal ist öffentlich; eine private Installation oder geheime GitHub-Zugangsdaten werden nicht unterstützt.
@@ -180,7 +182,7 @@ Tel.: +49 (0) 151 59156639
 E-Mail: Anfrage@Michael-Gahn.de
 <!-- /MGD-LEGAL -->
 
-## Plugin-Icon – Version 2.1.1
+## Plugin-Icon – Version 2.1.3
 
 Eigenes lokales Icon in der WordPress-Pluginliste. Die Grafik ist im Release-Paket enthalten; keine externen Bilddienste und keine neuen gespeicherten Daten. Vorhandene Funktionen und Einstellungen bleiben unverändert.
 
