@@ -68,7 +68,7 @@ Das Formular wird über einen Shortcode mit der jeweiligen Formular-ID eingebund
 Nach erfolgreicher Anmeldung zeigt das Plugin den Download-Button direkt anstelle des Formulars an — es gibt keine separate Erfolgsseite.
 
 > [!WARNING]
-> **⚠️ FALLSTRICK** — Seiten-Caching kann das Absenden des Formulars beeinflussen. Laut `readme.txt`-Changelog (Version 2.1.1 und 0.0.26) wurde das Absenden bereits „cache-toleranter" gemacht, inklusive JavaScript-Fallback und sichtbarer Fehlermeldung. Trotzdem gehört „Absenden auf gecachten Frontend-Seiten" laut `Dokumentation/Deployment.md` weiterhin zu den Punkten, die vor einem produktiven Release manuell geprüft werden sollen.
+> **⚠️ FALLSTRICK** — Seiten-Caching kann das Absenden des Formulars beeinflussen. Laut `readme.txt`-Changelog (Version 2.1.4 und 0.0.26) wurde das Absenden bereits „cache-toleranter" gemacht, inklusive JavaScript-Fallback und sichtbarer Fehlermeldung. Trotzdem gehört „Absenden auf gecachten Frontend-Seiten" laut `Dokumentation/Deployment.md` weiterhin zu den Punkten, die vor einem produktiven Release manuell geprüft werden sollen.
 
 ## Die wichtigsten Funktionen
 
@@ -94,7 +94,7 @@ Nach erfolgreicher Anmeldung zeigt das Plugin den Download-Button direkt anstell
 ## Grenzen
 
 - Bereits bekannte, direkte Upload-URLs aus der WordPress-Mediathek werden durch die maskierte, geschützte Kopie **nicht rückwirkend ungültig**. Wer eine solche URL schon kennt, kann die Datei weiterhin direkt aufrufen; dafür muss die originale Mediathek-Datei zusätzlich entfernt oder serverseitig blockiert werden.
-- Der letzte dokumentierte Sicherheitsreview (`Dokumentation/security_best_practices_report.md`, Prüfdatum 2026-04-29, geprüfte Version 2.1.1) konnte keinen vollständigen WordPress-Runtime-Test durchführen, da keine WordPress-Testinstallation, kein WP-CLI, kein Docker und kein lokaler MySQL-Server verfügbar waren.
+- Der letzte dokumentierte Sicherheitsreview (`Dokumentation/security_best_practices_report.md`, Prüfdatum 2026-04-29, geprüfte Version 2.1.4) konnte keinen vollständigen WordPress-Runtime-Test durchführen, da keine WordPress-Testinstallation, kein WP-CLI, kein Docker und kein lokaler MySQL-Server verfügbar waren.
 - Formularanmeldungen liegen lokal in der WordPress-Datenbank; für die Absicherung ist der Betreiber der Website selbst verantwortlich (Backups, Zugriffsschutz, Serverhärtung).
 
 > [!WARNING]
@@ -182,7 +182,7 @@ Tel.: +49 (0) 151 59156639
 E-Mail: Anfrage@Michael-Gahn.de
 <!-- /MGD-LEGAL -->
 
-## Plugin-Icon – Version 2.1.3
+## Plugin-Icon – Version 2.1.4
 
 Eigenes lokales Icon in der WordPress-Pluginliste. Die Grafik ist im Release-Paket enthalten; keine externen Bilddienste und keine neuen gespeicherten Daten. Vorhandene Funktionen und Einstellungen bleiben unverändert.
 
