@@ -3,7 +3,7 @@
  * Plugin Name: MGD Giveaway
  * Plugin URI: https://theme.michael-gahn.de/plugins/plugin-giveaway-wordpress
  * Description: Download-Formulare für Gratis-eBooks und PDFs mit Shortcode, Mail-Liste und Credits.
- * Version: 2.1.4
+ * Version: 2.2.0
  * Requires at least: 6.0
  * Requires PHP: 8.1
  * Author: Michael Gahn DESIGN
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('MGD_GIVEAWAY_VERSION', '2.1.4');
+define('MGD_GIVEAWAY_VERSION', '2.2.0');
 define('MGD_GIVEAWAY_FILE', __FILE__);
 define('MGD_GIVEAWAY_DIR', plugin_dir_path(__FILE__));
 define('MGD_GIVEAWAY_URL', plugin_dir_url(__FILE__));
